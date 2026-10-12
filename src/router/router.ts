@@ -6,7 +6,34 @@ const routes: RouteRecordRaw[] = [
         path: "/",
         name: "Layout",
         component: () => import("@/layout/Layout.vue"),
-    }
+        redirect: "/dashboard",
+        children: [
+            {
+                path: "dashboard",
+                name: "Dashboard",
+                component: () => import("@/views/Dashboard.vue"),
+                meta: { title: "menu.dashboard" },
+            },
+            {
+                path: "servers",
+                name: "Servers",
+                component: () => import("@/views/Servers.vue"),
+                meta: { title: "menu.servers" },
+            },
+            {
+                path: "tunnels",
+                name: "Tunnels",
+                component: () => import("@/views/Tunnels.vue"),
+                meta: { title: "menu.tunnels" },
+            },
+            {
+                path: "download",
+                name: "Download",
+                component: () => import("@/views/Download.vue"),
+                meta: { title: "menu.download" },
+            },
+        ],
+    },
 ]
 
 const router = createRouter({

@@ -1,0 +1,42 @@
+{
+  "app": {
+    "name": "Frpilot",
+    "description": "A visual client for frpc"
+  },
+  "titlebar": {
+    "language": "Language",
+    "theme": "Theme",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "settings": "Settings",
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close"
+  },
+  "language": {
+    "zhCN": "简体中文",
+    "enUS": "English"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "servers": "Servers",
+    "tunnels": "Tunnels",
+    "download": "Download frpc"
+  },
+  "system": {
+    "cpu": "CPU usage",
+    "memory": "Memory usage",
+    "status": "Status",
+    "statusRunning": "Running",
+    "statusError": "Error",
+    "statusStopped": "Stopped"
+  },
+  "settings": {
+    "title": "Settings",
+    "placeholder": "The settings page is under construction."
+  },
+  "common": {
+    "developing": "This feature is under construction"
+  }
+}

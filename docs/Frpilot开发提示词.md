@@ -1,27 +1,2 @@
 # Frpilot开发提示词
 
-## 背景
-
-> 该项目使用Tauri2 + Vue3为主要技术栈，主要解决Frpc配置繁琐的问题，方便用户快速配置frpc版本、隧道、服务器等
->
-> UI库：Antdv
-
-## 阶段提示词
-
-### 1. Layout布局
-
-本项目打算做一个Frpc的可视化客户端，方便用户快速配置frpc版本、隧道、服务器等，现在帮我完成以下功能：
-
-1. i18n国际化初始化配置
-   - 在locales目录中写多语言翻译json文件，初步支持中文和英文
-2. TitleBar页面开发
-   - 开发不同操作系统类型的自定义titlebar
-   - Windows系统的TitleBar最左侧显示Frpilot标题，右侧显示语言切换、明暗切换、设置、最小化、关闭，按照顺序展示；
-   - Mac系统的TitleBar最左侧显示红绿灯操作，右侧显示语言切换、明暗切换、设置、最小化、关闭，按照顺序展示；
-3. Layout页面布局开发
-   - Aside侧边栏开发，在Aside.vue文件里面编写，左侧菜单初步暂定为仪表盘、服务器、隧道列表、Frpc下载
-   - Aside侧边栏最底部显示CPU占用（百分比）、内存占用（百分比）、运行状态（绿色点运行正常，红色点运行异常，黄色点未启动），跟上方的菜单有间隔
-   - Header顶部栏，根据操作系统类型引入components里面的WindowsTitleBar.vue或MacTitleBar.vue
-4. Layout布局的side、content区域全部采用圆角矩形、类似于悬浮磨砂玻璃效果
-
-开发过程中使用到的组件尽可能全部使用Antdv库里面的，另外我引入的有tailwindcss原子化组件，开发之前尽可能先阅读一下package.json，看一下有哪些依赖可以简化代码开发
