@@ -1,6 +1,11 @@
 import { invoke } from "@tauri-apps/api/core"
 import type { ApiResponse } from "@/types/api"
-import type { FrpDownload, FrpDownloadPayload, FrpRelease } from "@/types/frp"
+import type {
+  FrpDownload,
+  FrpDownloadPayload,
+  FrpRelease,
+  FrpcStatus,
+} from "@/types/frp"
 
 /**
  * 调用后端命令并统一解包 ApiResponse。
@@ -41,4 +46,24 @@ export function deleteFrp(id: number) {
 /** 导入本地已下载的 frpc / frps（返回导入后的记录） */
 export function importFrp() {
   return call<FrpDownload[]>("import_frp")
+}
+
+/**
+ * 一键启动 Frpc。
+ *
+ * 后端会依据所选版本、已启用的服务器与隧道生成 frpc.toml 并拉起独立进程，
+ * 随后通过 `frpc-log` / `frpc-exit` 事件回传运行日志与退出信息。
+ */
+export function startFrpc(downloadId: number) {
+  return call<FrpcStatus>("start_frpc", { downloadId })
+}
+
+/** 停止 Frpc 服务进程 */
+export function stopFrpc() {
+  return call<FrpcStatus>("stop_frpc")
+}
+
+/** 获取 Frpc 当前运行状态 */
+export function getFrpcStatus() {
+  return call<FrpcStatus>("get_frpc_status")
 }

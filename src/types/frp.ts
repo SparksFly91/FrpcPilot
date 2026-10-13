@@ -87,3 +87,39 @@ export interface FrpDownloadProgress {
   /** 附加信息（错误原因等） */
   message: string | null
 }
+
+/** Frpc 运行状态 */
+export interface FrpcStatus {
+  /** 是否正在运行 */
+  running: boolean
+  /** 当前运行的 Frpc 版本号 */
+  version: string | null
+  /** frpc 可执行文件路径 */
+  frpc_path: string | null
+  /** 本次运行生成的 frpc.toml 路径 */
+  config_path: string | null
+  /** frpc 进程 PID */
+  pid: number | null
+}
+
+/** Frpc 实时日志事件（`frpc-log`） */
+export interface FrpcLogEvent {
+  /** frpc 输出中的时间戳（HH:MM:SS，可能为空） */
+  time: string | null
+  /** 日志级别：INFO / WARN / ERROR / DEBUG / TRACE */
+  level: string
+  /** 来源：stdout / stderr / system */
+  source: string
+  /** 日志内容 */
+  message: string
+}
+
+/** Frpc 进程退出事件（`frpc-exit`） */
+export interface FrpcExitEvent {
+  /** 退出原因：stopped（用户主动停止）/ exited（进程自行退出） */
+  reason: string
+  /** 退出码（主动终止时可能为空） */
+  code: number | null
+  /** 退出时对应的 Frpc 版本号 */
+  version: string | null
+}

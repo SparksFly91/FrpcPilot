@@ -102,12 +102,19 @@
         <a-button
           type="primary"
           :icon="h(PlayCircleOutlined)"
+          :loading="starting"
           :disabled="isRunning || !selectedId"
           @click="start"
         >
           {{ t("dashboard.start") }}
         </a-button>
-        <a-button danger :icon="h(PoweroffOutlined)" :disabled="!isRunning" @click="stop">
+        <a-button
+          danger
+          :icon="h(PoweroffOutlined)"
+          :loading="stopping"
+          :disabled="!isRunning"
+          @click="stop"
+        >
           {{ t("dashboard.stop") }}
         </a-button>
       </a-space>
@@ -120,7 +127,7 @@
       >
         <div class="flex items-center gap-2">
           <h3 class="text-sm font-semibold">{{ t("dashboard.logs") }}</h3>
-          <a-tag class="!me-0">{{ t("dashboard.mock") }}</a-tag>
+          <a-tag v-if="runningVersion" class="!me-0">{{ runningVersion }}</a-tag>
           <a-tag :color="statusTagColor" class="!me-0">{{ statusText }}</a-tag>
         </div>
 
@@ -155,14 +162,16 @@ import {
   PlayCircleOutlined,
   PoweroffOutlined,
 } from "@ant-design/icons-vue"
+import { message } from "ant-design-vue"
+import { listen, type UnlistenFn } from "@tauri-apps/api/event"
 import { useI18n } from "vue-i18n"
-import { getFrpDownloads } from "@/api/frp"
+import { getFrpDownloads, getFrpcStatus, startFrpc, stopFrpc } from "@/api/frp"
 import { getServerList } from "@/api/server"
 import { getSystemDetails } from "@/api/system"
 import { getTunnelList } from "@/api/tunnel"
 import { useAppStore } from "@/stores/app"
 import { useSystemStats } from "@/composables/useSystemStats"
-import type { FrpDownload } from "@/types/frp"
+import type { FrpDownload, FrpcExitEvent, FrpcLogEvent } from "@/types/frp"
 import type { SystemDetails } from "@/types/system"
 import { isTauri } from "@/utils/window"
 
@@ -210,6 +219,12 @@ const selectedVersion = computed(() => selectedDownload.value?.version ?? "-")
 
 const isRunning = computed(() => appStore.runStatus === "running")
 
+/** 当前运行的 Frpc 版本（用于日志区标签） */
+const runningVersion = ref("")
+/** 启动 / 停止按钮的 loading 状态 */
+const starting = ref(false)
+const stopping = ref(false)
+
 type LogLevel = "INFO" | "WARN" | "ERROR" | "DEBUG"
 
 interface LogLine {
@@ -222,8 +237,8 @@ const logs = ref<LogLine[]>([])
 const logBox = ref<HTMLElement | null>(null)
 
 /** 追加一行日志并自动滚动到底部（最多保留 500 行） */
-function pushLog(level: LogLevel, message: string) {
-  logs.value.push({ time: dayjs().format("HH:mm:ss"), level, message })
+function pushLog(level: LogLevel, message: string, time?: string) {
+  logs.value.push({ time: time || dayjs().format("HH:mm:ss"), level, message })
   if (logs.value.length > 500) {
     logs.value.splice(0, logs.value.length - 500)
   }
@@ -237,33 +252,76 @@ function clearLogs() {
   logs.value = []
 }
 
-function start() {
-  if (isRunning.value) return
-  appStore.runStatus = "running"
-  pushLog("INFO", t("dashboard.logStarted", { version: selectedVersion.value }))
+function errMsg(e: unknown) {
+  return e instanceof Error ? e.message : String(e)
 }
 
-function stop() {
-  if (!isRunning.value) return
-  appStore.runStatus = "stopped"
-  pushLog("WARN", t("dashboard.logStopped"))
+/** 将后端日志级别归一化为 UI 级别 */
+function normalizeLevel(level: string): LogLevel {
+  switch (level.toUpperCase()) {
+    case "WARN":
+    case "WARNING":
+      return "WARN"
+    case "ERROR":
+    case "FATAL":
+      return "ERROR"
+    case "DEBUG":
+    case "TRACE":
+      return "DEBUG"
+    default:
+      return "INFO"
+  }
 }
 
-/** 模拟实时日志：运行中定时追加 */
-const MOCK_LOGS: { level: LogLevel; message: string }[] = [
-  { level: "INFO", message: "login to server success" },
-  { level: "INFO", message: "start proxy success" },
-  { level: "DEBUG", message: "heartbeat sent to server" },
-  { level: "INFO", message: "new connection established" },
-  { level: "WARN", message: "connection timeout, retrying..." },
-  { level: "DEBUG", message: "connection closed by remote" },
-]
+/** 后端实时日志事件（frpc-log） */
+function onBackendLog(event: FrpcLogEvent) {
+  pushLog(normalizeLevel(event.level), event.message, event.time ?? undefined)
+}
 
-useIntervalFn(() => {
-  if (!isRunning.value) return
-  const item = MOCK_LOGS[Math.floor(Math.random() * MOCK_LOGS.length)]
-  pushLog(item.level, item.message)
-}, 1500)
+/** 后端进程退出事件（frpc-exit） */
+function onBackendExit(event: FrpcExitEvent) {
+  runningVersion.value = ""
+  if (event.reason === "stopped") {
+    appStore.runStatus = "stopped"
+    return
+  }
+  appStore.runStatus = event.code != null && event.code !== 0 ? "error" : "stopped"
+}
+
+/** 一键启动：由后端生成 frpc.toml 并拉起独立进程 */
+async function start() {
+  if (isRunning.value || starting.value) return
+  if (!selectedId.value) return
+
+  starting.value = true
+  try {
+    const status = await startFrpc(Number(selectedId.value))
+    appStore.runStatus = "running"
+    runningVersion.value = status.version ?? selectedVersion.value
+  } catch (e) {
+    appStore.runStatus = "error"
+    runningVersion.value = ""
+    pushLog("ERROR", t("dashboard.logStartFailed", { message: errMsg(e) }))
+    message.error(errMsg(e))
+  } finally {
+    starting.value = false
+  }
+}
+
+/** 停止 Frpc 服务进程 */
+async function stop() {
+  if (!isRunning.value || stopping.value) return
+  stopping.value = true
+  try {
+    await stopFrpc()
+    appStore.runStatus = "stopped"
+    runningVersion.value = ""
+  } catch (e) {
+    message.error(errMsg(e))
+  } finally {
+    stopping.value = false
+  }
+}
 
 /** 拉取服务器 / 隧道数量 */
 async function loadCounts() {
@@ -304,11 +362,34 @@ async function loadFrpDownloads() {
   }
 }
 
-onMounted(() => {
+let unlistenLog: UnlistenFn | null = null
+let unlistenExit: UnlistenFn | null = null
+
+onMounted(async () => {
   pushLog("INFO", t("dashboard.logReady"))
   loadCounts()
   loadSystemDetails()
   loadFrpDownloads()
+
+  if (!isTauri()) return
+
+  // 订阅后端实时日志与进程退出事件
+  unlistenLog = await listen<FrpcLogEvent>("frpc-log", (event) => onBackendLog(event.payload))
+  unlistenExit = await listen<FrpcExitEvent>("frpc-exit", (event) => onBackendExit(event.payload))
+
+  // 同步当前运行状态（避免页面切换后状态丢失）
+  try {
+    const status = await getFrpcStatus()
+    appStore.runStatus = status.running ? "running" : "stopped"
+    runningVersion.value = status.running ? status.version ?? "" : ""
+  } catch {
+    // 读取失败时保持默认状态
+  }
+})
+
+onUnmounted(() => {
+  unlistenLog?.()
+  unlistenExit?.()
 })
 
 /** 进度条颜色：低=蓝，中=橙，高=红 */

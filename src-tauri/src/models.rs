@@ -307,3 +307,42 @@ pub struct SystemDetails {
     pub ips: Vec<String>,
 }
 
+/// Frpc 运行状态（仪表盘快速操作区 / 侧边栏状态点使用）
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct FrpcStatus {
+    /// 是否正在运行
+    pub running: bool,
+    /// 当前运行的 Frpc 版本号
+    pub version: Option<String>,
+    /// frpc 可执行文件路径
+    pub frpc_path: Option<String>,
+    /// 本次运行生成的 frpc.toml 路径
+    pub config_path: Option<String>,
+    /// frpc 进程 PID
+    pub pid: Option<u32>,
+}
+
+/// Frpc 实时日志事件（通过 `frpc-log` 事件推送）
+#[derive(Debug, Clone, Serialize)]
+pub struct FrpcLogEvent {
+    /// frpc 输出中的时间戳（HH:MM:SS，可能为空）
+    pub time: Option<String>,
+    /// 日志级别：INFO / WARN / ERROR / DEBUG / TRACE
+    pub level: String,
+    /// 来源：stdout / stderr / system（system 为 Frpilot 自身补充的日志）
+    pub source: String,
+    /// 日志内容
+    pub message: String,
+}
+
+/// Frpc 进程退出事件（通过 `frpc-exit` 事件推送）
+#[derive(Debug, Clone, Serialize)]
+pub struct FrpcExitEvent {
+    /// 退出原因：stopped（用户主动停止）/ exited（进程自行退出）
+    pub reason: String,
+    /// 退出码（主动终止时可能为空）
+    pub code: Option<i32>,
+    /// 退出时对应的 Frpc 版本号
+    pub version: Option<String>,
+}
+

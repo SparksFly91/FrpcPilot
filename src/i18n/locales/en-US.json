@@ -50,7 +50,8 @@
     "logEmpty": "No logs yet. Live logs will appear here once Frpc starts.",
     "logReady": "Frpilot is ready. Waiting for Frpc to start.",
     "logStarted": "Frpc {version} started",
-    "logStopped": "Frpc stopped"
+    "logStopped": "Frpc stopped",
+    "logStartFailed": "Failed to start Frpc: {message}"
   },
   "settings": {
     "title": "Settings",
