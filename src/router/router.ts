@@ -32,6 +32,21 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("@/views/Download.vue"),
                 meta: { title: "menu.download" },
             },
+            {
+                path: "setting",
+                name: "Setting",
+                component: () => import("@/views/Setting.vue"),
+                redirect: "/setting/appearance",
+                meta: { title: "settings.title" },
+                children: [
+                    {
+                        path: "appearance",
+                        name: "Appearance",
+                        component: () => import("@/views/setting/Appearance.vue"),
+                        meta: { title: "settings.menu.appearance" },
+                    },
+                ],
+            },
         ],
     },
 ]

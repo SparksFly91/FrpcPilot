@@ -34,7 +34,24 @@
   },
   "settings": {
     "title": "Settings",
-    "placeholder": "The settings page is under construction."
+    "placeholder": "The settings page is under construction.",
+    "menu": {
+      "appearance": "Appearance"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Customize the theme mode and window background",
+      "themeMode": "Theme mode",
+      "themeModeTip": "Switch between light and dark mode",
+      "light": "Light",
+      "dark": "Dark",
+      "background": "Background image",
+      "backgroundTip": "Pick an image as the window background. It keeps its original aspect ratio and is never stretched.",
+      "none": "Default",
+      "bg1": "Background 1",
+      "bg2": "Background 2",
+      "bg3": "Background 3"
+    }
   },
   "common": {
     "developing": "This feature is under construction"

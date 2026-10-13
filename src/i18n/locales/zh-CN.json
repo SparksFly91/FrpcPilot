@@ -34,7 +34,24 @@
   },
   "settings": {
     "title": "设置",
-    "placeholder": "设置页面开发中，敬请期待。"
+    "placeholder": "设置页面开发中，敬请期待。",
+    "menu": {
+      "appearance": "外观设置"
+    },
+    "appearance": {
+      "title": "外观设置",
+      "subtitle": "自定义窗口的主题模式与背景图片",
+      "themeMode": "主题模式",
+      "themeModeTip": "切换窗口的明暗显示模式",
+      "light": "浅色",
+      "dark": "深色",
+      "background": "背景图片",
+      "backgroundTip": "选择一张图片作为窗口背景，图片保持原始比例自适应，不会变形拉伸",
+      "none": "默认",
+      "bg1": "背景一",
+      "bg2": "背景二",
+      "bg3": "背景三"
+    }
   },
   "common": {
     "developing": "功能开发中，敬请期待"

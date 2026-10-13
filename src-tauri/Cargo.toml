@@ -1,8 +1,8 @@
 [package]
 name = "frpilot"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "一个基于 Tauri 2 + Vue 3 + TypeScript 的 [frp](https://github.com/fatedier/frp) 可视化客户端，帮助用户快速配置 frpc 版本、服务器与隧道。"
+authors = ["SparksFly"]
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -14,15 +14,31 @@ edition = "2024"
 name = "frpilot_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[workspace]
+members = ["."]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+tauri-helper = "0.2.1"
 
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
+tauri-plugin-store = "2.4.4"
+tauri-helper = "0.2.1"
+sqlx = { version = "0.9.0", features = [
+    "runtime-tokio",
+    "sqlite",
+    "tls-native-tls",
+    "chrono",
+] }
+chrono = { version = "0.4.45", features = ["serde"] }
+tauri-plugin-dialog = "2.7.2"
+tauri-plugin-updater = "2.10.1"
+tauri-plugin-process = "2.3.1"
+tauri-plugin-prevent-default = "6.0.1"
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]
