@@ -88,9 +88,10 @@
       <div class="flex items-center gap-3">
         <span class="shrink-0 text-sm opacity-70">{{ t("dashboard.frpcVersion") }}</span>
         <a-select
-          v-model:value="selectedId"
+          v-model:value="frpcStore.selectedId"
           :options="versionOptions"
           :loading="versionsLoading"
+          :disabled="frpcStore.isRunning || frpcStore.starting"
           :placeholder="t('dashboard.frpcVersionEmpty')"
           class="w-64"
           show-search
@@ -102,8 +103,8 @@
         <a-button
           type="primary"
           :icon="h(PlayCircleOutlined)"
-          :loading="starting"
-          :disabled="isRunning || !selectedId"
+          :loading="frpcStore.starting"
+          :disabled="frpcStore.isRunning || !frpcStore.selectedId"
           @click="start"
         >
           {{ t("dashboard.start") }}
@@ -111,8 +112,8 @@
         <a-button
           danger
           :icon="h(PoweroffOutlined)"
-          :loading="stopping"
-          :disabled="!isRunning"
+          :loading="frpcStore.stopping"
+          :disabled="!frpcStore.isRunning"
           @click="stop"
         >
           {{ t("dashboard.stop") }}
@@ -127,12 +128,14 @@
       >
         <div class="flex items-center gap-2">
           <h3 class="text-sm font-semibold">{{ t("dashboard.logs") }}</h3>
-          <a-tag v-if="runningVersion" class="!me-0">{{ runningVersion }}</a-tag>
+          <a-tag v-if="frpcStore.runningVersion" class="!me-0">
+            {{ frpcStore.runningVersion }}
+          </a-tag>
           <a-tag :color="statusTagColor" class="!me-0">{{ statusText }}</a-tag>
         </div>
 
         <a-tooltip :title="t('dashboard.clear')">
-          <a-button size="small" :icon="h(ClearOutlined)" @click="clearLogs" />
+          <a-button size="small" :icon="h(ClearOutlined)" @click="frpcStore.clearLogs" />
         </a-tooltip>
       </div>
 
@@ -140,8 +143,8 @@
         ref="logBox"
         class="min-h-0 flex-1 overflow-y-auto px-5 py-3 font-mono text-xs leading-relaxed"
       >
-        <p v-if="!logs.length" class="opacity-50">{{ t("dashboard.logEmpty") }}</p>
-        <div v-for="(line, index) in logs" :key="index" class="flex gap-2">
+        <p v-if="!frpcStore.logs.length" class="opacity-50">{{ t("dashboard.logEmpty") }}</p>
+        <div v-for="(line, index) in frpcStore.logs" :key="index" class="flex gap-2">
           <span class="shrink-0 opacity-50">{{ line.time }}</span>
           <span class="shrink-0" :class="levelClass(line.level)">[{{ line.level }}]</span>
           <span class="break-all">{{ line.message }}</span>
@@ -153,7 +156,6 @@
 
 <script setup lang="ts">
 import { h } from "vue"
-import dayjs from "dayjs"
 import {
   ApiOutlined,
   ClearOutlined,
@@ -163,20 +165,21 @@ import {
   PoweroffOutlined,
 } from "@ant-design/icons-vue"
 import { message } from "ant-design-vue"
-import { listen, type UnlistenFn } from "@tauri-apps/api/event"
 import { useI18n } from "vue-i18n"
-import { getFrpDownloads, getFrpcStatus, startFrpc, stopFrpc } from "@/api/frp"
+import { getFrpDownloads } from "@/api/frp"
 import { getServerList } from "@/api/server"
 import { getSystemDetails } from "@/api/system"
 import { getTunnelList } from "@/api/tunnel"
 import { useAppStore } from "@/stores/app"
+import { useFrpcStore, type LogLevel } from "@/stores/frpc"
 import { useSystemStats } from "@/composables/useSystemStats"
-import type { FrpDownload, FrpcExitEvent, FrpcLogEvent } from "@/types/frp"
+import type { FrpDownload } from "@/types/frp"
 import type { SystemDetails } from "@/types/system"
 import { isTauri } from "@/utils/window"
 
 const { t } = useI18n()
 const appStore = useAppStore()
+const frpcStore = useFrpcStore()
 const { cpu, memory } = useSystemStats()
 
 /** 服务器 / 隧道数量（来自后端，未连接 Tauri 时保持 0） */
@@ -200,8 +203,6 @@ const statValueStyle = { fontSize: "20px", fontWeight: 600, lineHeight: "1.2" }
 /** 已下载 / 已导入的 Frp 版本（来自 frp_downloads） */
 const frpDownloads = ref<FrpDownload[]>([])
 const versionsLoading = ref(false)
-/** 当前选中的版本记录 ID */
-const selectedId = ref<string | undefined>(undefined)
 
 /** 仅展示具备 frpc 可执行文件的记录 */
 const versionOptions = computed(() =>
@@ -210,116 +211,44 @@ const versionOptions = computed(() =>
     .map((item) => ({ label: `${item.version} · ${item.platform}`, value: String(item.id) })),
 )
 
-const selectedDownload = computed(
-  () => frpDownloads.value.find((item) => String(item.id) === selectedId.value) ?? null,
-)
-
-/** 选中的版本号（用于日志展示） */
-const selectedVersion = computed(() => selectedDownload.value?.version ?? "-")
-
-const isRunning = computed(() => appStore.runStatus === "running")
-
-/** 当前运行的 Frpc 版本（用于日志区标签） */
-const runningVersion = ref("")
-/** 启动 / 停止按钮的 loading 状态 */
-const starting = ref(false)
-const stopping = ref(false)
-
-type LogLevel = "INFO" | "WARN" | "ERROR" | "DEBUG"
-
-interface LogLine {
-  time: string
-  level: LogLevel
-  message: string
-}
-
-const logs = ref<LogLine[]>([])
+/** 日志容器与自动滚动 */
 const logBox = ref<HTMLElement | null>(null)
 
-/** 追加一行日志并自动滚动到底部（最多保留 500 行） */
-function pushLog(level: LogLevel, message: string, time?: string) {
-  logs.value.push({ time: time || dayjs().format("HH:mm:ss"), level, message })
-  if (logs.value.length > 500) {
-    logs.value.splice(0, logs.value.length - 500)
-  }
+function scrollLogsToBottom() {
   nextTick(() => {
     const el = logBox.value
     if (el) el.scrollTop = el.scrollHeight
   })
 }
 
-function clearLogs() {
-  logs.value = []
-}
+// 日志追加时自动滚动到底部（日志保存在 store 中，切换页面不会清空）
+watch(() => frpcStore.logs.length, scrollLogsToBottom)
 
 function errMsg(e: unknown) {
   return e instanceof Error ? e.message : String(e)
 }
 
-/** 将后端日志级别归一化为 UI 级别 */
-function normalizeLevel(level: string): LogLevel {
-  switch (level.toUpperCase()) {
-    case "WARN":
-    case "WARNING":
-      return "WARN"
-    case "ERROR":
-    case "FATAL":
-      return "ERROR"
-    case "DEBUG":
-    case "TRACE":
-      return "DEBUG"
-    default:
-      return "INFO"
-  }
-}
-
-/** 后端实时日志事件（frpc-log） */
-function onBackendLog(event: FrpcLogEvent) {
-  pushLog(normalizeLevel(event.level), event.message, event.time ?? undefined)
-}
-
-/** 后端进程退出事件（frpc-exit） */
-function onBackendExit(event: FrpcExitEvent) {
-  runningVersion.value = ""
-  if (event.reason === "stopped") {
-    appStore.runStatus = "stopped"
-    return
-  }
-  appStore.runStatus = event.code != null && event.code !== 0 ? "error" : "stopped"
-}
-
 /** 一键启动：由后端生成 frpc.toml 并拉起独立进程 */
 async function start() {
-  if (isRunning.value || starting.value) return
-  if (!selectedId.value) return
+  if (frpcStore.isRunning || frpcStore.starting) return
+  if (!frpcStore.selectedId) return
 
-  starting.value = true
   try {
-    const status = await startFrpc(Number(selectedId.value))
-    appStore.runStatus = "running"
-    runningVersion.value = status.version ?? selectedVersion.value
+    await frpcStore.start(Number(frpcStore.selectedId))
   } catch (e) {
     appStore.runStatus = "error"
-    runningVersion.value = ""
-    pushLog("ERROR", t("dashboard.logStartFailed", { message: errMsg(e) }))
+    frpcStore.pushLog("ERROR", t("dashboard.logStartFailed", { message: errMsg(e) }))
     message.error(errMsg(e))
-  } finally {
-    starting.value = false
   }
 }
 
 /** 停止 Frpc 服务进程 */
 async function stop() {
-  if (!isRunning.value || stopping.value) return
-  stopping.value = true
+  if (!frpcStore.isRunning || frpcStore.stopping) return
   try {
-    await stopFrpc()
-    appStore.runStatus = "stopped"
-    runningVersion.value = ""
+    await frpcStore.stop()
   } catch (e) {
     message.error(errMsg(e))
-  } finally {
-    stopping.value = false
   }
 }
 
@@ -351,9 +280,12 @@ async function loadFrpDownloads() {
   versionsLoading.value = true
   try {
     frpDownloads.value = (await getFrpDownloads()) ?? []
-    // 默认选中最新一个可用版本
-    if (!selectedId.value && versionOptions.value.length) {
-      selectedId.value = versionOptions.value[0].value
+    const options = versionOptions.value
+    if (!options.length) return
+    // 运行中保持当前版本；否则已选版本失效时回退到最新一个
+    const valid = options.some((option) => option.value === frpcStore.selectedId)
+    if (!valid && !frpcStore.isRunning) {
+      frpcStore.selectedId = options[0].value
     }
   } catch {
     // 读取失败时保持空列表
@@ -362,34 +294,11 @@ async function loadFrpDownloads() {
   }
 }
 
-let unlistenLog: UnlistenFn | null = null
-let unlistenExit: UnlistenFn | null = null
-
-onMounted(async () => {
-  pushLog("INFO", t("dashboard.logReady"))
+onMounted(() => {
   loadCounts()
   loadSystemDetails()
   loadFrpDownloads()
-
-  if (!isTauri()) return
-
-  // 订阅后端实时日志与进程退出事件
-  unlistenLog = await listen<FrpcLogEvent>("frpc-log", (event) => onBackendLog(event.payload))
-  unlistenExit = await listen<FrpcExitEvent>("frpc-exit", (event) => onBackendExit(event.payload))
-
-  // 同步当前运行状态（避免页面切换后状态丢失）
-  try {
-    const status = await getFrpcStatus()
-    appStore.runStatus = status.running ? "running" : "stopped"
-    runningVersion.value = status.running ? status.version ?? "" : ""
-  } catch {
-    // 读取失败时保持默认状态
-  }
-})
-
-onUnmounted(() => {
-  unlistenLog?.()
-  unlistenExit?.()
+  scrollLogsToBottom()
 })
 
 /** 进度条颜色：低=蓝，中=橙，高=红 */
