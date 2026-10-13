@@ -5,6 +5,8 @@
     :confirm-loading="saving"
     :mask-closable="false"
     :width="640"
+    centered
+    wrap-class-name="form-modal-wrap"
     destroy-on-close
     :ok-text="t('common.save')"
     :cancel-text="t('common.cancel')"
@@ -522,3 +524,4 @@ async function handleOk() {
   }
 }
 </script>
+

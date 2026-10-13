@@ -4,6 +4,8 @@
     :title="isEdit ? t('server.form.editTitle') : t('server.form.addTitle')"
     :confirm-loading="saving"
     :mask-closable="false"
+    centered
+    wrap-class-name="form-modal-wrap"
     destroy-on-close
     :ok-text="t('common.save')"
     :cancel-text="t('common.cancel')"

@@ -84,6 +84,35 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
+/*
+ * 表单弹窗通用布局：
+ * 1. 弹窗整体高度不超过窗口的 80%；
+ * 2. 内容过多时仅弹窗主体（body）滚动，标题与底部按钮固定可见；
+ * 3. 只保留纵向滚动条，避免出现横向滚动条。
+ */
+.form-modal-wrap .ant-modal {
+  padding-bottom: 0;
+}
+
+.form-modal-wrap .ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.form-modal-wrap .ant-modal-header,
+.form-modal-wrap .ant-modal-footer {
+  flex: 0 0 auto;
+}
+
+.form-modal-wrap .ant-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 /* 细滚动条 */
 ::-webkit-scrollbar {
   width: 6px;
