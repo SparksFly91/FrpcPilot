@@ -8,7 +8,7 @@
     <div class="flex min-h-0 flex-1 gap-3 px-3 pb-3">
       <Aside />
 
-      <main class="glass-panel min-w-0 flex-1 overflow-y-auto">
+      <main class="min-w-0 flex-1 overflow-hidden">
         <router-view />
       </main>
     </div>

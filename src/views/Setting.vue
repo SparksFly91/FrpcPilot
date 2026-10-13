@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full min-h-0">
+  <div class="glass-panel flex h-full min-h-0">
     <!-- 左侧：设置菜单 -->
     <aside class="w-44 shrink-0 border-r border-slate-200/70 p-2 dark:border-white/10">
       <a-menu

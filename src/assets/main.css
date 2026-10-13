@@ -56,6 +56,12 @@ body {
   justify-content: center;
 }
 
+/* 主内容区卡片：去掉投影，避免上下卡片之间的阴影透过半透明背景叠加成灰色遮罩 */
+.glass-panel.glass-panel-flat,
+.dark .glass-panel.glass-panel-flat {
+  box-shadow: none;
+}
+
 /* 窗口圆角固定 8px，与 Windows 11 系统默认圆角保持一致 */
 #app {
   border-radius: 8px;
@@ -66,7 +72,7 @@ body {
 .glass-panel {
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);

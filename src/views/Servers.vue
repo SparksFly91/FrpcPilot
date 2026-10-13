@@ -1,7 +1,7 @@
 <template>
-  <div class="flex h-full flex-col gap-4 p-6">
-    <!-- 顶部：标题 + 操作按钮 -->
-    <div class="flex items-center justify-between gap-3">
+  <div class="flex h-full flex-col gap-3">
+    <!-- 顶部操作栏（独立磨砂卡片） -->
+    <div class="glass-panel glass-panel-flat flex shrink-0 items-center justify-between gap-3 px-5 py-3">
       <h2 class="text-lg font-semibold">{{ t("menu.servers") }}</h2>
       <a-space>
         <a-button :loading="loading" :icon="h(ReloadOutlined)" @click="refresh()">
@@ -13,16 +13,18 @@
       </a-space>
     </div>
 
-    <!-- 服务器列表 -->
-    <a-spin :spinning="loading" class="min-h-0 flex-1">
-      <a-empty v-if="!servers.length" class="mt-20" :description="t('server.empty')" />
+    <!-- 内容区（独立磨砂卡片，内部滚动） -->
+    <div class="glass-panel glass-panel-flat min-h-0 flex-1 overflow-y-auto p-5">
+      <a-spin :spinning="loading">
+        <a-empty v-if="!servers.length" class="mt-20" :description="t('server.empty')" />
 
-      <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <ServerCard v-for="item in servers" :key="item.id" :server="item" @edit="openEdit(item)"
-          @delete="onDelete(item)" @toggle-enabled="(value) => onToggleEnabled(item, value)"
-          @toggle-pinned="(value) => onTogglePinned(item, value)" />
-      </div>
-    </a-spin>
+        <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <ServerCard v-for="item in servers" :key="item.id" :server="item" @edit="openEdit(item)"
+            @delete="onDelete(item)" @toggle-enabled="(value) => onToggleEnabled(item, value)"
+            @toggle-pinned="(value) => onTogglePinned(item, value)" />
+        </div>
+      </a-spin>
+    </div>
 
     <!-- 新增 / 编辑弹窗 -->
     <ServerFormModal v-model:open="modalOpen" :server="editing" @saved="onSaved" />
