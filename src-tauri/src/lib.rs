@@ -8,6 +8,10 @@ use crate::commands::server::{
     create_server, delete_server, get_server_list, set_server_enabled, set_server_pinned,
     update_server,
 };
+use crate::commands::tunnel::{
+    create_tunnel, delete_tunnel, get_tunnel_list, set_tunnel_enabled, set_tunnel_pinned,
+    update_tunnel,
+};
 use crate::services::db::init_pool;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

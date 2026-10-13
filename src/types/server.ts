@@ -2,13 +2,7 @@
  * 服务器相关的类型定义，字段与 Rust 端 `models::Server` / `models::ServerPayload` 一一对应。
  */
 
-/** 统一响应结构，对应 Rust 端 `models::ApiResponse<T>` */
-export interface ApiResponse<T = unknown> {
-  success: boolean
-  code: number
-  msg: string
-  data: T | null
-}
+export type { ApiResponse } from "./api"
 
 /** 传输协议，对应 frpc 的 transport.protocol */
 export type ServerProtocol = "tcp" | "kcp" | "quic" | "websocket"

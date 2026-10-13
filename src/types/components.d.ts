@@ -14,6 +14,8 @@ declare module 'vue' {
     AButton: typeof import('ant-design-vue/es')['Button']
     ACard: typeof import('ant-design-vue/es')['Card']
     ACol: typeof import('ant-design-vue/es')['Col']
+    ACollapse: typeof import('ant-design-vue/es')['Collapse']
+    ACollapsePanel: typeof import('ant-design-vue/es')['CollapsePanel']
     AConfigProvider: typeof import('ant-design-vue/es')['ConfigProvider']
     ADivider: typeof import('ant-design-vue/es')['Divider']
     ADropdown: typeof import('ant-design-vue/es')['Dropdown']
@@ -44,6 +46,8 @@ declare module 'vue' {
     ServerCard: typeof import('./../components/server/ServerCard.vue')['default']
     ServerFormModal: typeof import('./../components/server/ServerFormModal.vue')['default']
     TitleBarActions: typeof import('./../components/TitleBarActions.vue')['default']
+    TunnelCard: typeof import('./../components/tunnel/TunnelCard.vue')['default']
+    TunnelFormModal: typeof import('./../components/tunnel/TunnelFormModal.vue')['default']
     WindowsTitleBar: typeof import('./../components/WindowsTitleBar.vue')['default']
   }
 }
