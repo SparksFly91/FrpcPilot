@@ -1,16 +1,11 @@
-import { invoke } from "@tauri-apps/api/core"
+import { getSystemInfo } from "@/api/system"
 import { isTauri } from "@/utils/window"
-
-interface SystemInfo {
-  cpu: number
-  memory: number
-}
 
 /**
  * 系统资源占用（CPU / 内存 百分比）。
  *
- * 优先调用后端命令 `get_system_info`（返回 { cpu, memory }），
- * 后端尚未实现时回退到模拟数据，保证界面可用。
+ * 调用后端命令 `get_system_info`（返回 `ApiResponse<{ cpu, memory }>`），
+ * 在非 Tauri 环境或后端不可用时回退到模拟数据，保证界面可用。
  */
 export function useSystemStats(interval = 2000) {
   const cpu = ref(0)
@@ -31,15 +26,13 @@ export function useSystemStats(interval = 2000) {
   async function refresh() {
     if (isTauri()) {
       try {
-        const res = await invoke<SystemInfo>("get_system_info")
-        if (res) {
-          cpu.value = Math.round(res.cpu)
-          memory.value = Math.round(res.memory)
-          isMock.value = false
-          return
-        }
+        const info = await getSystemInfo()
+        cpu.value = Math.round(info.cpu)
+        memory.value = Math.round(info.memory)
+        isMock.value = false
+        return
       } catch {
-        // 后端命令未实现，回退到模拟数据
+        // 后端命令不可用，回退到模拟数据
       }
     }
     mock()

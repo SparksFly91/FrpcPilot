@@ -33,6 +33,24 @@
     "statusError": "Error",
     "statusStopped": "Stopped"
   },
+  "dashboard": {
+    "serverCount": "Servers",
+    "tunnelCount": "Tunnels",
+    "hostname": "Hostname",
+    "os": "OS",
+    "arch": "Architecture",
+    "ip": "IP address",
+    "frpcVersion": "Frpc version",
+    "start": "One-click start",
+    "stop": "Stop",
+    "logs": "Live logs",
+    "clear": "Clear",
+    "mock": "Mock data",
+    "logEmpty": "No logs yet. Live logs will appear here once Frpc starts.",
+    "logReady": "Frpilot is ready. Waiting for Frpc to start.",
+    "logStarted": "Frpc {version} started",
+    "logStopped": "Frpc stopped"
+  },
   "settings": {
     "title": "Settings",
     "placeholder": "The settings page is under construction.",

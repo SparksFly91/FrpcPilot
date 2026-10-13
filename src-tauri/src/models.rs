@@ -157,8 +157,7 @@ pub struct Tunnel {
 
 /// 新增 / 编辑隧道的提交数据
 #[derive(Debug, Serialize, Deserialize)]
-pub struct TunnelPayload {
-    /// 编辑时携带，新增时为空
+pub struct TunnelPayload {    /// 编辑时携带，新增时为空
     pub id: Option<i64>,
     pub name: String,
     #[serde(rename = "type")]
@@ -185,5 +184,27 @@ pub struct TunnelPayload {
     pub sort: i32,
     pub pinned: bool,
     pub enabled: bool,
+}
+
+/// 系统资源占用（百分比，0 - 100）
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SystemInfo {
+    /// CPU 占用百分比
+    pub cpu: u32,
+    /// 内存占用百分比
+    pub memory: u32,
+}
+
+/// 系统信息（主机名、系统版本、架构、IP 地址）
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SystemDetails {
+    /// 主机名
+    pub hostname: String,
+    /// 操作系统版本
+    pub os: String,
+    /// 系统架构
+    pub arch: String,
+    /// 本机 IPv4 地址列表（不含回环地址）
+    pub ips: Vec<String>,
 }
 

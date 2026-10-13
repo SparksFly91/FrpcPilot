@@ -8,11 +8,13 @@ use crate::commands::server::{
     create_server, delete_server, get_server_list, set_server_enabled, set_server_pinned,
     update_server,
 };
+use crate::commands::system::{get_system_details, get_system_info};
 use crate::commands::tunnel::{
     create_tunnel, delete_tunnel, get_tunnel_list, set_tunnel_enabled, set_tunnel_pinned,
     update_tunnel,
 };
 use crate::services::db::init_pool;
+use crate::services::system::SystemStats;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -29,6 +31,11 @@ pub fn run() {
                     .expect("sqlite数据库连接池初始化失败!")
             });
             app.manage(pool);
+
+            // 系统资源占用（CPU / 内存）后台采集
+            let stats = SystemStats::default();
+            stats.start();
+            app.manage(stats);
 
             Ok(())
         })

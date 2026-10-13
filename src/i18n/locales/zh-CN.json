@@ -33,6 +33,24 @@
     "statusError": "运行异常",
     "statusStopped": "未启动"
   },
+  "dashboard": {
+    "serverCount": "服务器数量",
+    "tunnelCount": "隧道数量",
+    "hostname": "主机名",
+    "os": "系统",
+    "arch": "系统架构",
+    "ip": "IP 地址",
+    "frpcVersion": "Frpc 版本",
+    "start": "一键启动",
+    "stop": "停止",
+    "logs": "实时日志",
+    "clear": "清空",
+    "mock": "模拟数据",
+    "logEmpty": "暂无日志，启动 Frpc 后将在此显示实时日志",
+    "logReady": "Frpilot 已就绪，等待启动 Frpc",
+    "logStarted": "已启动 Frpc {version}",
+    "logStopped": "已停止 Frpc"
+  },
   "settings": {
     "title": "设置",
     "placeholder": "设置页面开发中，敬请期待。",

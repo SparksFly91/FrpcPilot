@@ -35,6 +35,7 @@ sqlx = { version = "0.9.0", features = [
     "chrono",
 ] }
 chrono = { version = "0.4.45", features = ["serde"] }
+sysinfo = "0.39"
 tauri-plugin-dialog = "2.7.2"
 tauri-plugin-updater = "2.10.1"
 tauri-plugin-process = "2.3.1"
