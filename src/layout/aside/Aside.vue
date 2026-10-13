@@ -3,50 +3,47 @@
   <aside class="glass-panel flex w-56 shrink-0 flex-col overflow-hidden">
     <!-- 菜单区 -->
     <div class="flex-1 overflow-y-auto p-2">
-      <a-menu
-        class="aside-menu"
-        mode="inline"
-        :selected-keys="selectedKeys"
-        :items="menuItems"
-        @click="onMenuClick"
-      />
+      <a-menu class="aside-menu" mode="inline" :selected-keys="selectedKeys" :items="menuItems" @click="onMenuClick" />
     </div>
 
     <!-- 底部系统信息区（与菜单之间有间隔） -->
-    <div class="system-panel mt-2 border-t p-3">
-      <!-- CPU -->
-      <div class="mb-2">
-        <div class="mb-1 flex items-center justify-between text-xs">
-          <span class="opacity-70">{{ t("system.cpu") }}</span>
-          <span class="font-medium tabular-nums">{{ cpu }}%</span>
+    <div class="system-panel mt-2 border-t px-2 pb-2 pt-3">
+      <div class="px-1">
+        <!-- CPU -->
+        <div class="mb-2">
+          <div class="mb-1 flex items-center justify-between text-xs">
+            <span class="opacity-70">{{ t("system.cpu") }}</span>
+            <span class="font-medium tabular-nums">{{ cpu }}%</span>
+          </div>
+          <a-progress :percent="cpu" :show-info="false" :stroke-color="barColor(cpu)" size="small" />
         </div>
-        <a-progress
-          :percent="cpu"
-          :show-info="false"
-          :stroke-color="barColor(cpu)"
-          size="small"
-        />
+
+        <!-- 内存 -->
+        <div class="mb-3">
+          <div class="mb-1 flex items-center justify-between text-xs">
+            <span class="opacity-70">{{ t("system.memory") }}</span>
+            <span class="font-medium tabular-nums">{{ memory }}%</span>
+          </div>
+          <a-progress :percent="memory" :show-info="false" :stroke-color="barColor(memory)" size="small" />
+        </div>
+
+        <!-- 运行状态 -->
+        <div class="flex items-center gap-2 text-xs">
+          <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass" />
+          <span class="opacity-70">{{ t("system.status") }}</span>
+          <span class="font-medium">{{ statusText }}</span>
+        </div>
       </div>
 
-      <!-- 内存 -->
-      <div class="mb-3">
-        <div class="mb-1 flex items-center justify-between text-xs">
-          <span class="opacity-70">{{ t("system.memory") }}</span>
-          <span class="font-medium tabular-nums">{{ memory }}%</span>
-        </div>
-        <a-progress
-          :percent="memory"
-          :show-info="false"
-          :stroke-color="barColor(memory)"
-          size="small"
+      <!-- 设置入口（位于运行状态下方） -->
+      <div class="system-divider mt-3 border-t pt-2">
+        <a-menu
+          class="aside-menu"
+          mode="inline"
+          :selected-keys="settingSelectedKeys"
+          :items="settingItems"
+          @click="onMenuClick"
         />
-      </div>
-
-      <!-- 运行状态 -->
-      <div class="flex items-center gap-2 text-xs">
-        <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass" />
-        <span class="opacity-70">{{ t("system.status") }}</span>
-        <span class="font-medium">{{ statusText }}</span>
       </div>
     </div>
   </aside>
@@ -59,6 +56,7 @@ import {
   CloudServerOutlined,
   DashboardOutlined,
   DownloadOutlined,
+  SettingOutlined,
 } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
 import type { MenuProps } from "ant-design-vue"
@@ -74,11 +72,18 @@ const { cpu, memory } = useSystemStats()
 
 const selectedKeys = computed(() => [route.path])
 
+/** 设置项在运行状态下方独立渲染，子路由（如 /setting/appearance）同样高亮 */
+const settingSelectedKeys = computed(() => (route.path.startsWith("/setting") ? ["/setting"] : []))
+
 const menuItems = computed<MenuProps["items"]>(() => [
   { key: "/dashboard", icon: () => h(DashboardOutlined), label: t("menu.dashboard") },
   { key: "/servers", icon: () => h(CloudServerOutlined), label: t("menu.servers") },
   { key: "/tunnels", icon: () => h(ApiOutlined), label: t("menu.tunnels") },
   { key: "/download", icon: () => h(DownloadOutlined), label: t("menu.download") },
+])
+
+const settingItems = computed<MenuProps["items"]>(() => [
+  { key: "/setting", icon: () => h(SettingOutlined), label: t("menu.setting") },
 ])
 
 const onMenuClick: MenuProps["onClick"] = ({ key }) => {
@@ -122,6 +127,15 @@ const statusText = computed(() => {
 
 .dark .system-panel {
   border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 系统信息与设置入口之间的分隔线 */
+.system-divider {
+  border-color: rgba(15, 23, 42, 0.06);
+}
+
+.dark .system-divider {
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 /* 让 Antd 菜单透明化，融入磨砂玻璃面板 */

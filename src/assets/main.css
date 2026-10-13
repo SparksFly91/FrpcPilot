@@ -11,10 +11,48 @@ body,
   padding: 0;
 }
 
+/*
+ * 背景统一绘制在 <html> 上：
+ * 根元素的背景会被绘制到整个画布（canvas）上，铺满窗口的每一个像素，
+ * 不会出现“元素高度(100vh) 与实际窗口差几个像素”导致的上下留白。
+ */
+html {
+  background-color: #eef2ff;
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.28), transparent 60%),
+    radial-gradient(1000px 500px at 110% 10%, rgba(34, 211, 238, 0.28), transparent 55%),
+    linear-gradient(160deg, #eef2ff 0%, #f8fafc 45%, #eef7ff 100%);
+  background-repeat: no-repeat;
+}
+
+html.dark {
+  background-color: #0b1220;
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.35), transparent 60%),
+    radial-gradient(1000px 500px at 110% 10%, rgba(14, 165, 233, 0.28), transparent 55%),
+    linear-gradient(160deg, #0b1220 0%, #0f172a 45%, #111827 100%);
+}
+
+/* 选中自定义背景图时替换为图片：等比缩放铺满，不拉伸变形 */
+html.has-bg-image {
+  background-image: var(--app-bg-image, none);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
 body {
   overflow: hidden;
   font-family: 'Inter', 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 背景交由 <html> 绘制，body 保持透明避免覆盖画布背景 */
+  background-color: transparent;
+}
+
+/* 窗口圆角固定 8px，与 Windows 11 系统默认圆角保持一致 */
+#app {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* 悬浮磨砂玻璃面板 */

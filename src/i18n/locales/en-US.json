@@ -22,7 +22,8 @@
     "dashboard": "Dashboard",
     "servers": "Servers",
     "tunnels": "Tunnels",
-    "download": "Download frpc"
+    "download": "Download frpc",
+    "setting": "Settings"
   },
   "system": {
     "cpu": "CPU usage",

@@ -32,6 +32,19 @@ export const useAppStore = defineStore("app", () => {
   const background = useStorage<BackgroundKey>("frpilot:background", DEFAULT_BACKGROUND)
   const backgroundUrl = computed(() => getBackgroundUrl(background.value))
 
+  // 把背景图同步到 <html>（整窗背景，避免元素高度误差造成的上下留白）
+  watchEffect(() => {
+    const root = document.documentElement
+    const url = backgroundUrl.value
+    if (url) {
+      root.style.setProperty("--app-bg-image", `url('${url}')`)
+      root.classList.add("has-bg-image")
+    } else {
+      root.classList.remove("has-bg-image")
+      root.style.removeProperty("--app-bg-image")
+    }
+  })
+
   // Frpc 运行状态（后续由后端驱动）
   const runStatus = ref<RunStatus>("stopped")
 

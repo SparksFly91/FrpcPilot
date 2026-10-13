@@ -22,7 +22,8 @@
     "dashboard": "仪表盘",
     "servers": "服务器",
     "tunnels": "隧道列表",
-    "download": "Frpc 下载"
+    "download": "Frpc 下载",
+    "setting": "设置"
   },
   "system": {
     "cpu": "CPU 占用",
