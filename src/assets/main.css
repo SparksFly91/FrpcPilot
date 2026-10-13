@@ -49,6 +49,13 @@ body {
   background-color: transparent;
 }
 
+/* Antd 按钮：图标与文字按 flex 垂直居中（Tailwind preflight 会把 svg 设为 block，导致行内对齐偏移） */
+.ant-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
 /* 窗口圆角固定 8px，与 Windows 11 系统默认圆角保持一致 */
 #app {
   border-radius: 8px;

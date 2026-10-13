@@ -54,7 +54,44 @@
       "bg3": "背景三"
     }
   },
+  "server": {
+    "refresh": "刷新",
+    "add": "新增服务器",
+    "empty": "暂无服务器，点击右上角新增",
+    "edit": "编辑",
+    "delete": "删除",
+    "deleteConfirm": "确定要删除服务器「{name}」吗？",
+    "name": "名称",
+    "namePlaceholder": "请输入服务器名称",
+    "addr": "服务器地址",
+    "addrPlaceholder": "IP 地址或域名，如 127.0.0.1 / frp.example.com",
+    "port": "端口",
+    "token": "鉴权 Token",
+    "tokenPlaceholder": "对应 frpc 的 auth.token，可留空",
+    "protocol": "传输协议",
+    "tls": "启用 TLS",
+    "remark": "备注",
+    "remarkPlaceholder": "可选备注信息",
+    "sort": "排序",
+    "pinned": "置顶",
+    "enabled": "启用",
+    "enabledTip": "同时只能启用一个服务器",
+    "saveSuccess": "保存成功",
+    "deleteSuccess": "删除成功",
+    "form": {
+      "addTitle": "新增服务器",
+      "editTitle": "编辑服务器",
+      "nameRequired": "请输入服务器名称",
+      "addrRequired": "请输入服务器地址",
+      "addrInvalid": "请输入合法的 IP 地址或域名",
+      "portRequired": "请输入端口号",
+      "portRange": "端口号必须在 1 - 65535 之间"
+    }
+  },
   "common": {
-    "developing": "功能开发中，敬请期待"
+    "developing": "功能开发中，敬请期待",
+    "confirm": "确定",
+    "cancel": "取消",
+    "save": "保存"
   }
 }

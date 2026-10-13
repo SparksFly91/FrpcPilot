@@ -16,5 +16,28 @@ pub async fn init_pool(app: &AppHandle) -> Result<SqlitePool, sqlx::Error> {
         .connect_with(options)
         .await?;
 
+    // 初始化表结构
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS servers (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            name        TEXT    NOT NULL,
+            addr        TEXT    NOT NULL,
+            port        INTEGER NOT NULL DEFAULT 7000,
+            token       TEXT,
+            protocol    TEXT    NOT NULL DEFAULT 'tcp',
+            tls_enable  INTEGER NOT NULL DEFAULT 0,
+            remark      TEXT,
+            sort        INTEGER NOT NULL DEFAULT 0,
+            pinned      INTEGER NOT NULL DEFAULT 0,
+            enabled     INTEGER NOT NULL DEFAULT 0,
+            created_at  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+            updated_at  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+        )
+        "#,
+    )
+    .execute(&pool)
+    .await?;
+
     Ok(pool)
 }

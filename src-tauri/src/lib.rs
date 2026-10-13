@@ -4,7 +4,10 @@ mod services;
 
 use tauri::Manager;
 
-use crate::commands::server::get_server_list;
+use crate::commands::server::{
+    create_server, delete_server, get_server_list, set_server_enabled, set_server_pinned,
+    update_server,
+};
 use crate::services::db::init_pool;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

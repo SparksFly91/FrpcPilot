@@ -54,7 +54,44 @@
       "bg3": "Background 3"
     }
   },
+  "server": {
+    "refresh": "Refresh",
+    "add": "Add server",
+    "empty": "No servers yet. Click Add in the top right corner.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete server \"{name}\"?",
+    "name": "Name",
+    "namePlaceholder": "Enter a server name",
+    "addr": "Server address",
+    "addrPlaceholder": "IP or domain, e.g. 127.0.0.1 / frp.example.com",
+    "port": "Port",
+    "token": "Auth token",
+    "tokenPlaceholder": "Corresponds to frpc auth.token, optional",
+    "protocol": "Transport protocol",
+    "tls": "Enable TLS",
+    "remark": "Remark",
+    "remarkPlaceholder": "Optional remark",
+    "sort": "Sort",
+    "pinned": "Pinned",
+    "enabled": "Enabled",
+    "enabledTip": "Only one server can be enabled at a time",
+    "saveSuccess": "Saved successfully",
+    "deleteSuccess": "Deleted successfully",
+    "form": {
+      "addTitle": "Add server",
+      "editTitle": "Edit server",
+      "nameRequired": "Please enter the server name",
+      "addrRequired": "Please enter the server address",
+      "addrInvalid": "Please enter a valid IP address or domain",
+      "portRequired": "Please enter the port",
+      "portRange": "Port must be between 1 and 65535"
+    }
+  },
   "common": {
-    "developing": "This feature is under construction"
+    "developing": "This feature is under construction",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "save": "Save"
   }
 }
