@@ -41,6 +41,7 @@
     "arch": "系统架构",
     "ip": "IP 地址",
     "frpcVersion": "Frpc 版本",
+    "frpcVersionEmpty": "暂无已下载版本，请先前往 Frpc 下载页面下载",
     "start": "一键启动",
     "stop": "停止",
     "logs": "实时日志",
@@ -178,6 +179,34 @@
       "localPortRequired": "请输入本地端口",
       "remotePortRequired": "请输入远程端口",
       "portRange": "端口号必须在 1 - 65535 之间"
+    }
+  },
+  "frp": {
+    "refresh": "刷新",
+    "import": "导入本地",
+    "showAllArchFrpc": "所有架构 Frpc",
+    "showAllArchFrps": "所有架构 Frps",
+    "empty": "暂无 Frp 版本数据，点击刷新重试",
+    "downloaded": "已下载",
+    "local": "本地",
+    "download": "下载",
+    "copyLink": "复制下载链接",
+    "delete": "删除",
+    "deleteConfirm": "确定要删除已下载的 {version}（{platform}）吗？",
+    "size": "大小",
+    "downloadCount": "下载次数",
+    "publishedAt": "发布日期",
+    "downloadSuccess": "下载完成",
+    "deleteSuccess": "删除成功",
+    "copySuccess": "下载链接已复制",
+    "copyFailed": "复制失败，请手动复制",
+    "importSuccess": "已导入 {count} 个文件",
+    "importEmpty": "未选择任何文件",
+    "status": {
+      "downloading": "下载中",
+      "extracting": "解压中",
+      "done": "已完成",
+      "error": "下载失败"
     }
   },
   "common": {

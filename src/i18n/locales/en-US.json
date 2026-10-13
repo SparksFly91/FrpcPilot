@@ -41,6 +41,7 @@
     "arch": "Architecture",
     "ip": "IP address",
     "frpcVersion": "Frpc version",
+    "frpcVersionEmpty": "No downloaded version yet. Download one from the Frpc download page first.",
     "start": "One-click start",
     "stop": "Stop",
     "logs": "Live logs",
@@ -178,6 +179,34 @@
       "localPortRequired": "Please enter the local port",
       "remotePortRequired": "Please enter the remote port",
       "portRange": "Port must be between 1 and 65535"
+    }
+  },
+  "frp": {
+    "refresh": "Refresh",
+    "import": "Import local",
+    "showAllArchFrpc": "All-arch Frpc",
+    "showAllArchFrps": "All-arch Frps",
+    "empty": "No Frp release data. Click Refresh to retry.",
+    "downloaded": "Downloaded",
+    "local": "Local",
+    "download": "Download",
+    "copyLink": "Copy download link",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete {version} ({platform})?",
+    "size": "Size",
+    "downloadCount": "Downloads",
+    "publishedAt": "Published",
+    "downloadSuccess": "Download completed",
+    "deleteSuccess": "Deleted successfully",
+    "copySuccess": "Download link copied",
+    "copyFailed": "Copy failed, please copy manually",
+    "importSuccess": "Imported {count} file(s)",
+    "importEmpty": "No file selected",
+    "status": {
+      "downloading": "Downloading",
+      "extracting": "Extracting",
+      "done": "Done",
+      "error": "Download failed"
     }
   },
   "common": {

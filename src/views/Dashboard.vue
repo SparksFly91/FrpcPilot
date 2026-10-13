@@ -87,14 +87,22 @@
     >
       <div class="flex items-center gap-3">
         <span class="shrink-0 text-sm opacity-70">{{ t("dashboard.frpcVersion") }}</span>
-        <a-select v-model:value="selectedVersion" :options="versionOptions" class="w-56" />
+        <a-select
+          v-model:value="selectedId"
+          :options="versionOptions"
+          :loading="versionsLoading"
+          :placeholder="t('dashboard.frpcVersionEmpty')"
+          class="w-64"
+          show-search
+          option-filter-prop="label"
+        />
       </div>
 
       <a-space>
         <a-button
           type="primary"
           :icon="h(PlayCircleOutlined)"
-          :disabled="isRunning"
+          :disabled="isRunning || !selectedId"
           @click="start"
         >
           {{ t("dashboard.start") }}
@@ -148,11 +156,13 @@ import {
   PoweroffOutlined,
 } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
+import { getFrpDownloads } from "@/api/frp"
 import { getServerList } from "@/api/server"
 import { getSystemDetails } from "@/api/system"
 import { getTunnelList } from "@/api/tunnel"
 import { useAppStore } from "@/stores/app"
 import { useSystemStats } from "@/composables/useSystemStats"
+import type { FrpDownload } from "@/types/frp"
 import type { SystemDetails } from "@/types/system"
 import { isTauri } from "@/utils/window"
 
@@ -178,13 +188,25 @@ const ipFull = computed(() => (details.value?.ips?.length ? details.value.ips.jo
 /** 合并卡片中两个统计数值的样式（更紧凑） */
 const statValueStyle = { fontSize: "20px", fontWeight: 600, lineHeight: "1.2" }
 
-/** 模拟：已下载的 Frpc 版本列表（下载功能尚未实现） */
-const versionOptions = [
-  { label: "v0.61.1 · windows_amd64", value: "v0.61.1" },
-  { label: "v0.60.0 · windows_amd64", value: "v0.60.0" },
-  { label: "v0.58.2 · windows_amd64", value: "v0.58.2" },
-]
-const selectedVersion = ref(versionOptions[0].value)
+/** 已下载 / 已导入的 Frp 版本（来自 frp_downloads） */
+const frpDownloads = ref<FrpDownload[]>([])
+const versionsLoading = ref(false)
+/** 当前选中的版本记录 ID */
+const selectedId = ref<string | undefined>(undefined)
+
+/** 仅展示具备 frpc 可执行文件的记录 */
+const versionOptions = computed(() =>
+  frpDownloads.value
+    .filter((item) => item.frpc_path)
+    .map((item) => ({ label: `${item.version} · ${item.platform}`, value: String(item.id) })),
+)
+
+const selectedDownload = computed(
+  () => frpDownloads.value.find((item) => String(item.id) === selectedId.value) ?? null,
+)
+
+/** 选中的版本号（用于日志展示） */
+const selectedVersion = computed(() => selectedDownload.value?.version ?? "-")
 
 const isRunning = computed(() => appStore.runStatus === "running")
 
@@ -265,10 +287,28 @@ async function loadSystemDetails() {
   }
 }
 
+/** 拉取已下载 / 已导入的 Frp 版本，供版本下拉选择 */
+async function loadFrpDownloads() {
+  if (!isTauri()) return
+  versionsLoading.value = true
+  try {
+    frpDownloads.value = (await getFrpDownloads()) ?? []
+    // 默认选中最新一个可用版本
+    if (!selectedId.value && versionOptions.value.length) {
+      selectedId.value = versionOptions.value[0].value
+    }
+  } catch {
+    // 读取失败时保持空列表
+  } finally {
+    versionsLoading.value = false
+  }
+}
+
 onMounted(() => {
   pushLog("INFO", t("dashboard.logReady"))
   loadCounts()
   loadSystemDetails()
+  loadFrpDownloads()
 })
 
 /** 进度条颜色：低=蓝，中=橙，高=红 */

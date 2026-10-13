@@ -186,6 +186,105 @@ pub struct TunnelPayload {    /// 编辑时携带，新增时为空
     pub enabled: bool,
 }
 
+/// 已下载 / 已导入的 Frp 版本（对应 SQLite 中的 frp_downloads 表）
+///
+/// 一个发行包（version + platform）同时包含 frpc 与 frps 两个可执行文件，
+/// 故 `frpc_path` / `frps_path` 分别记录解压（或导入）后的可执行文件路径。
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct FrpDownload {
+    pub id: i64,
+    /// 版本号，如 v0.71.0
+    pub version: String,
+    /// 操作系统，如 windows / darwin / linux
+    pub os: String,
+    /// CPU 架构，如 amd64 / arm64
+    pub arch: String,
+    /// 平台标识（os_arch），如 windows_amd64
+    pub platform: String,
+    /// 发行包文件名
+    pub file_name: String,
+    /// 压缩包保存路径（导入的记录可能为空）
+    pub archive_path: Option<String>,
+    /// 解压 / 导入后的 frpc 可执行文件路径
+    pub frpc_path: Option<String>,
+    /// 解压 / 导入后的 frps 可执行文件路径
+    pub frps_path: Option<String>,
+    /// 文件大小（字节）
+    pub file_size: i64,
+    /// 来源：download（应用内下载）/ import（本地导入）
+    pub source: String,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+/// GitHub 上的 Frp 发行包（前端卡片展示用）
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FrpRelease {
+    /// 版本号，如 v0.71.0
+    pub version: String,
+    /// 操作系统
+    pub os: String,
+    /// CPU 架构
+    pub arch: String,
+    /// 平台标识（os_arch）
+    pub platform: String,
+    /// 发行包文件名
+    pub file_name: String,
+    /// 文件大小（字节）
+    pub size: i64,
+    /// GitHub 下载次数
+    pub download_count: i64,
+    /// 发布日期（ISO 8601）
+    pub published_at: String,
+    /// GitHub 原始下载地址
+    pub download_url: String,
+    /// 镜像加速后的下载地址
+    pub mirror_url: String,
+    /// 是否已下载 / 已导入
+    pub downloaded: bool,
+    /// 是否匹配当前运行平台（用于前端默认过滤）
+    pub is_current: bool,
+    /// 是否为仅本机存在的记录（未匹配到发行包）
+    pub local_only: bool,
+    /// 本机记录 ID（用于删除）
+    pub local_id: Option<i64>,
+    /// 本机 frpc 可执行文件路径
+    pub frpc_path: Option<String>,
+    /// 本机 frps 可执行文件路径
+    pub frps_path: Option<String>,
+}
+
+/// 下载 / 导入请求
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FrpDownloadPayload {
+    pub version: String,
+    pub os: String,
+    pub arch: String,
+    pub platform: String,
+    pub file_name: String,
+    /// GitHub 原始下载地址（后端会拼接镜像前缀）
+    pub download_url: String,
+}
+
+/// Frp 下载进度事件（通过 `frp-download-progress` 事件推送）
+#[derive(Debug, Clone, Serialize)]
+pub struct FrpDownloadProgress {
+    /// 事件键，与发行包文件名一致，用于前端定位卡片
+    pub key: String,
+    pub version: String,
+    pub platform: String,
+    /// 已下载字节数
+    pub downloaded: u64,
+    /// 总字节数（0 表示未知）
+    pub total: u64,
+    /// 进度百分比（0 - 100）
+    pub percent: u8,
+    /// 状态：downloading / extracting / done / error
+    pub status: String,
+    /// 附加信息（错误原因等）
+    pub message: Option<String>,
+}
+
 /// 系统资源占用（百分比，0 - 100）
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SystemInfo {

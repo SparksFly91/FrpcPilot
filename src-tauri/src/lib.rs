@@ -4,6 +4,9 @@ mod services;
 
 use tauri::Manager;
 
+use crate::commands::frp::{
+    delete_frp, download_frp, get_frp_downloads, get_frp_releases, import_frp,
+};
 use crate::commands::server::{
     create_server, delete_server, get_server_list, set_server_enabled, set_server_pinned,
     update_server,

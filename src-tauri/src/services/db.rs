@@ -76,5 +76,30 @@ pub async fn init_pool(app: &AppHandle) -> Result<SqlitePool, sqlx::Error> {
     .execute(&pool)
     .await?;
 
+    // 已下载 / 已导入的 Frp 版本表
+    // 同一版本 + 平台唯一，一个发行包内同时含 frpc 与 frps 两个可执行文件
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS frp_downloads (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            version      TEXT    NOT NULL,
+            os           TEXT    NOT NULL,
+            arch         TEXT    NOT NULL,
+            platform     TEXT    NOT NULL,
+            file_name    TEXT    NOT NULL,
+            archive_path TEXT,
+            frpc_path    TEXT,
+            frps_path    TEXT,
+            file_size    INTEGER NOT NULL DEFAULT 0,
+            source       TEXT    NOT NULL DEFAULT 'download',
+            created_at   TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+            updated_at   TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+            UNIQUE(version, platform)
+        )
+        "#,
+    )
+    .execute(&pool)
+    .await?;
+
     Ok(pool)
 }
