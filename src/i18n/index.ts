@@ -32,9 +32,9 @@ export function setI18nLanguage(language: Language) {
   i18n.global.locale.value = language
 }
 
-/** 在非组件环境（如路由守卫）中获取翻译函数 */
-export function translate(key: string) {
-  return i18n.global.t(key)
+/** 在非组件环境（如路由守卫、store）中获取翻译函数 */
+export function translate(key: string, params?: Record<string, unknown>) {
+  return i18n.global.t(key, params ?? {})
 }
 
 export default i18n

@@ -37,6 +37,27 @@
       </template>
     </a-button>
 
+    <!-- 检查更新 -->
+    <a-button
+      type="text"
+      class="tb-btn"
+      :title="t('titlebar.checkUpdate')"
+      :loading="updateStore.checking"
+      @click="onCheckUpdate"
+    >
+      <template #icon><CloudSyncOutlined /></template>
+    </a-button>
+
+    <!-- GitHub -->
+    <a-button
+      type="text"
+      class="tb-btn"
+      :title="t('titlebar.github')"
+      @click="onOpenGithub"
+    >
+      <template #icon><GithubOutlined /></template>
+    </a-button>
+
     <!-- 设置 -->
     <a-button
       type="text"
@@ -74,6 +95,8 @@ import {
   BulbFilled,
   BulbOutlined,
   CloseOutlined,
+  CloudSyncOutlined,
+  GithubOutlined,
   MinusOutlined,
   SettingOutlined,
   TranslationOutlined,
@@ -81,16 +104,29 @@ import {
 import { useI18n } from "vue-i18n"
 import type { MenuProps } from "ant-design-vue"
 import { useAppStore } from "@/stores/app"
+import { useUpdateStore } from "@/stores/update"
 import { languageOptions, type Language } from "@/i18n"
 import { closeWindow, minimizeWindow } from "@/utils/window"
+import { openProjectRepo } from "@/api/updater"
 
 const emit = defineEmits<{ settings: [] }>()
 
 const { t } = useI18n()
 const appStore = useAppStore()
+const updateStore = useUpdateStore()
 
 const onLanguageClick: MenuProps["onClick"] = ({ key }) => {
   appStore.setLanguage(key as Language)
+}
+
+/** 顶部栏手动检查更新（非静默，无更新 / 失败都会给出提示） */
+function onCheckUpdate() {
+  void updateStore.checkForUpdate(false)
+}
+
+/** 打开项目 GitHub 仓库 */
+function onOpenGithub() {
+  void openProjectRepo()
 }
 </script>
 

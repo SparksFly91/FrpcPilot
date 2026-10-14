@@ -36,6 +36,7 @@ declare module 'vue' {
     ASpace: typeof import('ant-design-vue/es')['Space']
     ASpin: typeof import('ant-design-vue/es')['Spin']
     AStatistic: typeof import('ant-design-vue/es')['Statistic']
+    ASteps: typeof import('ant-design-vue/es')['Steps']
     ASwitch: typeof import('ant-design-vue/es')['Switch']
     ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
@@ -49,6 +50,7 @@ declare module 'vue' {
     TitleBarActions: typeof import('./../components/TitleBarActions.vue')['default']
     TunnelCard: typeof import('./../components/tunnel/TunnelCard.vue')['default']
     TunnelFormModal: typeof import('./../components/tunnel/TunnelFormModal.vue')['default']
+    UpdateModal: typeof import('./../components/UpdateModal.vue')['default']
     WindowsTitleBar: typeof import('./../components/WindowsTitleBar.vue')['default']
   }
 }

@@ -8,6 +8,8 @@
     "theme": "Theme",
     "lightMode": "Light mode",
     "darkMode": "Dark mode",
+    "checkUpdate": "Check for updates",
+    "github": "GitHub",
     "settings": "Settings",
     "minimize": "Minimize",
     "maximize": "Maximize",
@@ -57,7 +59,8 @@
     "title": "Settings",
     "placeholder": "The settings page is under construction.",
     "menu": {
-      "appearance": "Appearance"
+      "appearance": "Appearance",
+      "about": "About"
     },
     "appearance": {
       "title": "Appearance",
@@ -209,6 +212,44 @@
       "done": "Done",
       "error": "Download failed"
     }
+  },
+  "about": {
+    "title": "About Frpilot",
+    "subtitle": "A lightweight, friendly visual client for frp",
+    "introTitle": "Introduction",
+    "intro": "Frpilot is a visual client for frp built with Tauri 2 + Vue 3 + TypeScript. Manage frpc versions, servers and tunnels through a friendly GUI — and say goodbye to hand-writing frpc.toml.",
+    "flowTitle": "How to use",
+    "flow": {
+      "step1Title": "Download frpc",
+      "step1Desc": "Open \"Download frpc\", grab the build for your platform and architecture, or import a local one.",
+      "step2Title": "Configure a server",
+      "step2Desc": "Add the frps address, port and auth token under \"Servers\", then enable one of them.",
+      "step3Title": "Configure tunnels",
+      "step3Desc": "Create and enable the tunnels you need (TCP / HTTP, etc.) under \"Tunnels\".",
+      "step4Title": "One-click start",
+      "step4Desc": "Head back to the \"Dashboard\" and start Frpc with a single click, watching live logs and status."
+    },
+    "repoTitle": "Open source",
+    "repoDesc": "Stars, issues and contributions are all welcome~",
+    "openRepo": "Open GitHub",
+    "versionTitle": "Version",
+    "currentVersion": "Current version",
+    "checkUpdate": "Check for updates",
+    "newVersion": "New version v{version} is available"
+  },
+  "update": {
+    "title": "New version v{version} is available ✨",
+    "hello": "Ta-da~ A brand new version is ready and waiting for you (๑•̀ㅂ•́)و✧",
+    "tip": "Here's what this little update brings — scroll down and take a peek~",
+    "log": "What's new",
+    "emptyLog": "No release notes this time — the author was too lazy, but updating is still a good idea~",
+    "ignore": "Ignore this version",
+    "confirm": "Update now",
+    "downloading": "Downloading the package… hang tight, almost there!",
+    "desktopOnly": "Update checks are unavailable in dev mode. Please use the desktop app~",
+    "upToDate": "You're already on the latest version, enjoy~",
+    "checkFailed": "Update check failed: {message}",
+    "ignoreSuccess": "Version ignored. We won't bother you again~"
   },
   "common": {
     "developing": "This feature is under construction",

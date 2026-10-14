@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { h } from "vue"
-import { BgColorsOutlined } from "@ant-design/icons-vue"
+import { BgColorsOutlined, InfoCircleOutlined } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
 import type { MenuProps } from "ant-design-vue"
 
@@ -35,6 +35,11 @@ const menuItems = computed<MenuProps["items"]>(() => [
     key: "/setting/appearance",
     icon: () => h(BgColorsOutlined),
     label: t("settings.menu.appearance"),
+  },
+  {
+    key: "/setting/about",
+    icon: () => h(InfoCircleOutlined),
+    label: t("settings.menu.about"),
   },
 ])
 

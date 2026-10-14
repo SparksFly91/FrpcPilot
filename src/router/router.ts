@@ -45,6 +45,12 @@ const routes: RouteRecordRaw[] = [
                         component: () => import("@/views/setting/Appearance.vue"),
                         meta: { title: "settings.menu.appearance" },
                     },
+                    {
+                        path: "about",
+                        name: "About",
+                        component: () => import("@/views/setting/About.vue"),
+                        meta: { title: "settings.menu.about" },
+                    },
                 ],
             },
         ],

@@ -163,6 +163,51 @@ body {
   overflow-y: auto;
 }
 
+/*
+ * 更新弹窗：高度不超过窗口的 60%，内容过多时仅主体（body）滚动，
+ * 标题与底部按钮固定可见；沿用磨砂玻璃质感。
+ */
+.update-modal-wrap .ant-modal {
+  padding-bottom: 0;
+}
+
+.update-modal-wrap .ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18) !important;
+}
+
+.update-modal-wrap .ant-modal-header,
+.update-modal-wrap .ant-modal-footer {
+  flex: 0 0 auto;
+  border-color: rgba(15, 23, 42, 0.06);
+  background: transparent !important;
+}
+
+.dark .update-modal-wrap .ant-modal-content {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.72) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .update-modal-wrap .ant-modal-header,
+.dark .update-modal-wrap .ant-modal-footer {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.update-modal-wrap .ant-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 /* 细滚动条 */
 ::-webkit-scrollbar {
   width: 6px;

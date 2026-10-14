@@ -12,17 +12,28 @@
         <router-view />
       </main>
     </div>
+
+    <!-- 全局更新弹窗 -->
+    <UpdateModal />
   </div>
 </template>
 
 <script setup lang="ts">
 import Header from "./header/Header.vue"
 import Aside from "./aside/Aside.vue"
+import UpdateModal from "@/components/UpdateModal.vue"
+import { useUpdateStore } from "@/stores/update"
 
 const router = useRouter()
+const updateStore = useUpdateStore()
 
 /** 点击标题栏“设置”按钮 → 跳转设置页 */
 function goToSetting() {
   router.push("/setting")
 }
+
+// 应用启动后静默检查一次更新（已忽略的版本不会打扰用户）
+onMounted(() => {
+  updateStore.checkForUpdate(true)
+})
 </script>
