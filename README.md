@@ -230,6 +230,11 @@ const { t } = useI18n()
 
 - 前端封装：`src/utils/window.ts`（`minimizeWindow` / `toggleMaximizeWindow` / `closeWindow` / `startDragging` 等），在非 Tauri 环境（浏览器）下自动空转。
 - 自定义标题栏依赖无边框窗口（`src-tauri/tauri.conf.json` 中 `decorations: false`），拖拽区域通过 `data-tauri-drag-region` 实现。
+- **窗口圆角（8px）**：Windows 11 由系统 DWM 自动裁切；macOS 的无边框窗口系统不会裁圆角，因此：
+  - `src-tauri/tauri.macos.conf.json` 中把窗口设为 `transparent: true`（**Tauri 2.12.1+ 无需再开启 `macOSPrivateApi`**）；
+  - `src/assets/main.css` 中在 `html.is-macos` 下把背景从 `<html>` 移到 `#app`，由 `#app` 裁出 8px 圆角，并让 `html`/`body` 透明以透出桌面；
+  - `src/main.ts` 在挂载前根据 UA 给 `<html>` 打上 `is-macos` 标记。
+  - ⚠️ 平台配置文件按 **JSON Merge Patch** 合并，且**数组整体替换**，因此 `tauri.macos.conf.json` 里必须完整重复 `app.windows` 的字段；**修改基础配置的窗口参数时，记得同步这份文件**。
 - 相关权限在 `src-tauri/capabilities/default.json` 中声明（`core:window:*`、`updater:default`、`process:default` 等）。**新增窗口 / 插件 API 调用时需同步补充对应权限**，否则会报 `not allowed` 错误。
 
 ### 发布与自动更新

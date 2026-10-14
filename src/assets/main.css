@@ -11,26 +11,33 @@ body,
   padding: 0;
 }
 
-/*
- * 背景统一绘制在 <html> 上：
- * 根元素的背景会被绘制到整个画布（canvas）上，铺满窗口的每一个像素，
- * 不会出现“元素高度(100vh) 与实际窗口差几个像素”导致的上下留白。
- */
-html {
-  background-color: #eef2ff;
-  background-image:
+/* 窗口背景色与渐变（供 html / #app 复用，避免重复定义） */
+:root {
+  --app-bg-color: #eef2ff;
+  --app-bg-gradient:
     radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.28), transparent 60%),
     radial-gradient(1000px 500px at 110% 10%, rgba(34, 211, 238, 0.28), transparent 55%),
     linear-gradient(160deg, #eef2ff 0%, #f8fafc 45%, #eef7ff 100%);
-  background-repeat: no-repeat;
 }
 
 html.dark {
-  background-color: #0b1220;
-  background-image:
+  --app-bg-color: #0b1220;
+  --app-bg-gradient:
     radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.35), transparent 60%),
     radial-gradient(1000px 500px at 110% 10%, rgba(14, 165, 233, 0.28), transparent 55%),
     linear-gradient(160deg, #0b1220 0%, #0f172a 45%, #111827 100%);
+}
+
+/*
+ * 默认（Windows / Linux）：背景绘制在 <html> 上。
+ * 根元素的背景会被绘制到整个画布（canvas）上，铺满窗口的每一个像素，
+ * 不会出现“元素高度(100vh) 与实际窗口差几个像素”导致的上下留白；
+ * 窗口圆角交给系统裁切（Windows 11 的 DWM 默认就是 8px 圆角）。
+ */
+html {
+  background-color: var(--app-bg-color);
+  background-image: var(--app-bg-gradient);
+  background-repeat: no-repeat;
 }
 
 /* 选中自定义背景图时替换为图片：等比缩放铺满，不拉伸变形 */
@@ -41,11 +48,44 @@ html.has-bg-image {
   background-repeat: no-repeat;
 }
 
+/*
+ * macOS：无边框窗口系统不会自动裁圆角（不像 Windows 11 的 DWM），
+ * 因此通过 tauri.macos.conf.json 开启 transparent 窗口，
+ * 再把背景从 <html> 移到 #app 上并由 #app 裁出 8px 圆角，
+ * html/body 保持完全透明，让圆角之外的区域透出桌面壁纸。
+ */
+html.is-macos,
+html.is-macos body {
+  background: transparent !important;
+}
+
+html.is-macos #app {
+  position: fixed;
+  inset: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--app-bg-color);
+  background-image: var(--app-bg-gradient);
+  background-repeat: no-repeat;
+}
+
+html.is-macos.has-bg-image #app {
+  background-image: var(--app-bg-image, none);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* 全屏遮罩跟随窗口圆角，避免弹窗打开时遮罩把圆角「填方」 */
+html.is-macos .ant-modal-mask {
+  border-radius: 8px;
+}
+
 body {
   overflow: hidden;
   font-family: 'Inter', 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  /* 背景交由 <html> 绘制，body 保持透明避免覆盖画布背景 */
+  /* 背景交由 <html>（或 macOS 下的 #app）绘制，body 保持透明避免覆盖画布背景 */
   background-color: transparent;
 }
 
