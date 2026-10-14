@@ -41,7 +41,7 @@
       "active": true,
       "dialog": true,
       "endpoints": ["https://ghproxy.net/https://github.com/SparksFly91/Frpilot/releases/latest/download/latest.json"],
-      "pubkey": ""
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU0REVGMTREODFFOTI2MUEKUldRYUp1bUJUZkhlNU1qRmlPQm5xSmdQd24waFltVmNtTjlUallYVmdva1VGNkp5bTVGcVlsZUgK"
     }
   }
 }

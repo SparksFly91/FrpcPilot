@@ -1,0 +1,134 @@
+name: "Publish Release"
+
+on:
+  push:
+    tags:
+      - "v*" # 推送 v1.0.0 之类的 tag 时触发
+  workflow_dispatch: # 也支持手动触发
+
+permissions:
+  contents: write # 需要写入权限来创建 Release
+
+jobs:
+  publish-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS Apple Silicon (M1/M2/M3)
+          - platform: "macos-latest"
+            args: "--target aarch64-apple-darwin --bundles app,dmg"
+
+          # Windows x64
+          - platform: "windows-latest"
+            args: "--bundles nsis"
+
+          # Linux x64（用 22.04 以获得更宽的 glibc 兼容性）
+          - platform: "ubuntu-22.04"
+            args: "--bundles deb,appimage"
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # 2. 安装 pnpm（必须先于 setup-node 的 pnpm 缓存）
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      # 3. 安装 Node.js
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      # 4. 安装 Rust
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add macOS Apple Silicon target
+        if: matrix.platform == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin
+
+      # 4.1 安装 Linux 构建所需的系统依赖（WebKitGTK / GTK / OpenSSL 等）
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      # 5. Rust 缓存（大幅加速后续构建）
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # 6. 安装前端依赖
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 7. 从 docs/CHANGELOG.md 提取当前 tag 对应版本的更新日志
+      - name: Extract changelog for release
+        id: changelog
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const content = fs.readFileSync("docs/CHANGELOG.md", "utf8");
+            const lines = content.split(/\r?\n/);
+            const marker = "## " + process.env.RELEASE_TAG;
+            const startIdx = lines.findIndex((l) => l.trim().startsWith(marker));
+            if (startIdx === -1) {
+              fs.writeFileSync("release_body.md", "");
+              process.exit(0);
+            }
+            let endIdx = lines.length;
+            for (let i = startIdx + 1; i < lines.length; i++) {
+              if (/^##\s/.test(lines[i])) {
+                endIdx = i;
+                break;
+              }
+            }
+            fs.writeFileSync(
+              "release_body.md",
+              lines.slice(startIdx + 1, endIdx).join("\n").trim()
+            );
+          '
+          {
+            echo "body<<CHANGELOG_BODY_EOF"
+            cat release_body.md
+            # release_body.md is deliberately trimmed and may not end in a newline.
+            # Ensure the closing delimiter occupies its own line in GITHUB_OUTPUT.
+            printf '\nCHANGELOG_BODY_EOF\n'
+          } >> "$GITHUB_OUTPUT"
+
+      # 8. 构建并发布（核心步骤）
+      - name: Build app & publish release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: v__VERSION__ # 自动替换为 src-tauri/tauri.conf.json（即 package.json）里的版本号
+          releaseName: "Frpilot v__VERSION__"
+          releaseBody: ${{ steps.changelog.outputs.body }}
+          releaseDraft: true # 先创建草稿，手动确认后再发布
+          prerelease: false
+          args: ${{ matrix.args }}
