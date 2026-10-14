@@ -60,11 +60,19 @@ export const useUpdateStore = defineStore("update", () => {
       return
     }
 
+    // 已检测到可用更新（例如用户点过「取消」关掉了弹窗）：直接重新打开，
+    // 避免重复联网检查、重复创建后端资源；徽标也因此能持续提示。
+    if (pending) {
+      modalOpen.value = true
+      return
+    }
+
     checking.value = true
     try {
       const update = await checkForAppUpdate()
 
       if (!update) {
+        info.value = null
         if (!silent) message.success(translate("update.upToDate"))
         return
       }
@@ -107,9 +115,12 @@ export const useUpdateStore = defineStore("update", () => {
     }
   }
 
-  /** 取消（本次不更新，下次启动仍会提示） */
+  /**
+   * 取消：仅关闭弹窗，保留已检测到的可用更新。
+   * 顶部栏 / 关于页的圆点徽标会继续提示，再次点击「检查更新」可重新打开弹窗。
+   */
   function cancel() {
-    void discard()
+    modalOpen.value = false
   }
 
   /** 忽略该版本（持久化，静默检查不再提示） */

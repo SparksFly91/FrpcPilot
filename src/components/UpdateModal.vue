@@ -1,15 +1,6 @@
 <template>
-  <a-modal
-    :open="store.modalOpen"
-    :title="modalTitle"
-    :closable="!store.installing"
-    :mask-closable="false"
-    :keyboard="!store.installing"
-    :width="520"
-    centered
-    wrap-class-name="update-modal-wrap"
-    @cancel="onCancel"
-  >
+  <a-modal :open="store.modalOpen" :title="modalTitle" :closable="!store.installing" :mask-closable="false"
+    :keyboard="!store.installing" :width="520" centered wrap-class-name="update-modal-wrap" @cancel="onCancel">
     <!-- 俏皮的问候 + 版本变化 -->
     <div class="update-hero">
       <span class="update-hero-emoji">🎉</span>

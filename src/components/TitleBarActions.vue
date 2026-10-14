@@ -2,22 +2,14 @@
   <div class="flex items-center gap-1">
     <!-- 语言切换 -->
     <a-dropdown placement="bottomRight" trigger="click">
-      <a-button
-        type="text"
-        class="tb-btn"
-        :title="t('titlebar.language')"
-      >
-        <template #icon><TranslationOutlined /></template>
+      <a-button type="text" class="tb-btn" :title="t('titlebar.language')">
+        <template #icon>
+          <TranslationOutlined />
+        </template>
       </a-button>
       <template #overlay>
-        <a-menu
-          :selected-keys="[appStore.language]"
-          @click="onLanguageClick"
-        >
-          <a-menu-item
-            v-for="item in languageOptions"
-            :key="item.key"
-          >
+        <a-menu :selected-keys="[appStore.language]" @click="onLanguageClick">
+          <a-menu-item v-for="item in languageOptions" :key="item.key">
             {{ item.label }}
           </a-menu-item>
         </a-menu>
@@ -25,69 +17,50 @@
     </a-dropdown>
 
     <!-- 明暗切换 -->
-    <a-button
-      type="text"
-      class="tb-btn"
-      :title="appStore.isDark ? t('titlebar.lightMode') : t('titlebar.darkMode')"
-      @click="appStore.toggleDark()"
-    >
+    <a-button type="text" class="tb-btn" :title="appStore.isDark ? t('titlebar.lightMode') : t('titlebar.darkMode')"
+      @click="appStore.toggleDark()">
       <template #icon>
         <BulbFilled v-if="appStore.isDark" />
         <BulbOutlined v-else />
       </template>
     </a-button>
 
-    <!-- 检查更新 -->
-    <a-button
-      type="text"
-      class="tb-btn"
-      :title="t('titlebar.checkUpdate')"
-      :loading="updateStore.checking"
-      @click="onCheckUpdate"
-    >
-      <template #icon><CloudSyncOutlined /></template>
-    </a-button>
+    <!-- 检查更新（有新版本时显示圆点徽标） -->
+    <a-badge :dot="updateStore.hasUpdate">
+      <a-button type="text" class="tb-btn" :title="t('titlebar.checkUpdate')" :loading="updateStore.checking"
+        @click="onCheckUpdate">
+        <template #icon>
+          <CloudSyncOutlined />
+        </template>
+      </a-button>
+    </a-badge>
 
     <!-- GitHub -->
-    <a-button
-      type="text"
-      class="tb-btn"
-      :title="t('titlebar.github')"
-      @click="onOpenGithub"
-    >
-      <template #icon><GithubOutlined /></template>
+    <a-button type="text" class="tb-btn" :title="t('titlebar.github')" @click="onOpenGithub">
+      <template #icon>
+        <GithubOutlined />
+      </template>
     </a-button>
 
     <!-- 设置 -->
-    <a-button
-      type="text"
-      class="tb-btn"
-      :title="t('titlebar.settings')"
-      @click="emit('settings')"
-    >
-      <template #icon><SettingOutlined /></template>
+    <a-button type="text" class="tb-btn" :title="t('titlebar.settings')" @click="emit('settings')">
+      <template #icon>
+        <SettingOutlined />
+      </template>
     </a-button>
 
     <!-- 最小化（macOS 由左侧红绿灯负责，此处隐藏） -->
-    <a-button
-      v-if="!isMac"
-      type="text"
-      class="tb-btn"
-      :title="t('titlebar.minimize')"
-      @click="minimizeWindow()"
-    >
-      <template #icon><MinusOutlined /></template>
+    <a-button v-if="!isMac" type="text" class="tb-btn" :title="t('titlebar.minimize')" @click="minimizeWindow()">
+      <template #icon>
+        <MinusOutlined />
+      </template>
     </a-button>
 
     <!-- 关闭（macOS 由左侧红绿灯负责，此处隐藏） -->
-    <a-button
-      v-if="!isMac"
-      type="text"
-      class="tb-btn tb-btn-close"
-      :title="t('titlebar.close')"
-      @click="closeWindow()"
-    >
-      <template #icon><CloseOutlined /></template>
+    <a-button v-if="!isMac" type="text" class="tb-btn tb-btn-close" :title="t('titlebar.close')" @click="closeWindow()">
+      <template #icon>
+        <CloseOutlined />
+      </template>
     </a-button>
   </div>
 </template>

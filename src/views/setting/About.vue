@@ -48,9 +48,11 @@
       <div class="flex flex-wrap items-center gap-3">
         <span class="text-xs opacity-60">{{ t("about.currentVersion") }}</span>
         <a-tag color="purple" class="!me-0">v{{ version }}</a-tag>
-        <a-button size="small" :loading="updateStore.checking" @click="onCheckUpdate">
-          {{ t("about.checkUpdate") }}
-        </a-button>
+        <a-badge :dot="updateStore.hasUpdate">
+          <a-button size="small" :loading="updateStore.checking" @click="onCheckUpdate">
+            {{ t("about.checkUpdate") }}
+          </a-button>
+        </a-badge>
         <span v-if="updateStore.hasUpdate" class="text-xs text-[#6366f1]">
           {{ t("about.newVersion", { version: updateStore.info?.version }) }}
         </span>
