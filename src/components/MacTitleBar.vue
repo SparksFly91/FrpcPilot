@@ -10,7 +10,7 @@
         class="traffic-light bg-[#ff5f57]"
         :class="{ 'traffic-light--idle': !focused }"
         :title="t('titlebar.close')"
-        @click="closeWindow()"
+        @click="windowStore.requestClose()"
       >
         <svg viewBox="0 0 12 12" class="light-icon opacity-0 group-hover/lights:opacity-100">
           <path d="M3.5 3.5l5 5M8.5 3.5l-5 5" />
@@ -45,11 +45,13 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
 import TitleBarActions from "./TitleBarActions.vue"
-import { closeWindow, minimizeWindow } from "@/utils/window"
+import { useWindowStore } from "@/stores/window"
+import { minimizeWindow } from "@/utils/window"
 
 const emit = defineEmits<{ settings: [] }>()
 
 const { t } = useI18n()
+const windowStore = useWindowStore()
 const focused = useWindowFocus()
 </script>
 

@@ -8,9 +8,12 @@
 import { theme as antdTheme } from "ant-design-vue"
 import { useAppStore } from "@/stores/app"
 import { useFrpcStore } from "@/stores/frpc"
+import { useWindowStore } from "@/stores/window"
+import { initTray } from "@/composables/useTray"
 
 const appStore = useAppStore()
 const frpcStore = useFrpcStore()
+const windowStore = useWindowStore()
 
 /** 跟随明暗主题切换 Ant Design Vue 的算法 */
 const themeConfig = computed(() => ({
@@ -24,6 +27,9 @@ const themeConfig = computed(() => ({
 // 应用根组件初始化一次：订阅 frpc 日志/退出事件，离开仪表盘后仍持续收集
 onMounted(() => {
   frpcStore.init()
+  // 系统托盘（前端 API 方式）与窗口关闭拦截
+  initTray()
+  windowStore.init()
 })
 </script>
 

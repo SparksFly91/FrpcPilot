@@ -57,7 +57,7 @@
     </a-button>
 
     <!-- 关闭（macOS 由左侧红绿灯负责，此处隐藏） -->
-    <a-button v-if="!isMac" type="text" class="tb-btn tb-btn-close" :title="t('titlebar.close')" @click="closeWindow()">
+    <a-button v-if="!isMac" type="text" class="tb-btn tb-btn-close" :title="t('titlebar.close')" @click="windowStore.requestClose()">
       <template #icon>
         <CloseOutlined />
       </template>
@@ -80,8 +80,9 @@ import { useI18n } from "vue-i18n"
 import type { MenuProps } from "ant-design-vue"
 import { useAppStore } from "@/stores/app"
 import { useUpdateStore } from "@/stores/update"
+import { useWindowStore } from "@/stores/window"
 import { languageOptions, type Language } from "@/i18n"
-import { closeWindow, minimizeWindow } from "@/utils/window"
+import { minimizeWindow } from "@/utils/window"
 import { openProjectRepo } from "@/api/updater"
 import { usePlatform } from "@/composables/usePlatform"
 
@@ -90,6 +91,7 @@ const emit = defineEmits<{ settings: [] }>()
 const { t } = useI18n()
 const appStore = useAppStore()
 const updateStore = useUpdateStore()
+const windowStore = useWindowStore()
 const { isMac } = usePlatform()
 
 const onLanguageClick: MenuProps["onClick"] = ({ key }) => {

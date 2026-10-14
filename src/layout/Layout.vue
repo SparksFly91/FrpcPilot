@@ -15,6 +15,9 @@
 
     <!-- 全局更新弹窗 -->
     <UpdateModal />
+
+    <!-- 关闭确认对话框（最小化到系统托盘 / 直接退出） -->
+    <CloseConfirmModal />
   </div>
 </template>
 
@@ -22,6 +25,7 @@
 import Header from "./header/Header.vue"
 import Aside from "./aside/Aside.vue"
 import UpdateModal from "@/components/UpdateModal.vue"
+import CloseConfirmModal from "@/components/CloseConfirmModal.vue"
 import { useUpdateStore } from "@/stores/update"
 
 const router = useRouter()

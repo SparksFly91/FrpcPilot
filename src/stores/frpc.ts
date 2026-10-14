@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import dayjs from "dayjs"
 import { listen } from "@tauri-apps/api/event"
-import { getFrpcStatus, startFrpc, stopFrpc } from "@/api/frp"
+import { getFrpcStatus, getFrpDownloads, startFrpc, stopFrpc } from "@/api/frp"
 import { translate } from "@/i18n"
 import { useAppStore } from "@/stores/app"
 import type { FrpcExitEvent, FrpcLogEvent, FrpcStatus } from "@/types/frp"
@@ -41,6 +41,12 @@ export const useFrpcStore = defineStore("frpc", () => {
 
   /** 是否正在运行 */
   const isRunning = computed(() => appStore.runStatus === "running")
+
+  /** 是否可启动（未运行且不在启动中，供托盘菜单联动） */
+  const canStart = computed(() => !isRunning.value && !starting.value)
+
+  /** 是否可停止（运行中且不在停止中，供托盘菜单联动） */
+  const canStop = computed(() => isRunning.value && !stopping.value)
 
   /** 追加一行日志（最多保留 MAX_LOGS 行） */
   function pushLog(level: LogLevel, message: string, time?: string) {
@@ -136,6 +142,32 @@ export const useFrpcStore = defineStore("frpc", () => {
     }
   }
 
+  /**
+   * 确保已选中一个可用的 Frpc 版本。
+   *
+   * 托盘可能在未打开仪表盘时触发启动，此时下拉框尚未加载数据、selectedId 为空，
+   * 这里自行拉取并回退到第一个带 frpc 可执行文件的版本。
+   */
+  async function ensureSelectedVersion() {
+    if (selectedId.value) return
+    try {
+      const downloads = (await getFrpDownloads()) ?? []
+      const first = downloads.find((item) => item.frpc_path)
+      if (first) selectedId.value = String(first.id)
+    } catch {
+      // 读取失败时保持为空，由调用方提示
+    }
+  }
+
+  /** 使用当前选中版本一键启动（供托盘菜单复用仪表盘的启动逻辑） */
+  async function startSelected(): Promise<FrpcStatus> {
+    await ensureSelectedVersion()
+    if (!selectedId.value) {
+      throw new Error(translate("dashboard.frpcVersionEmpty"))
+    }
+    return start(Number(selectedId.value))
+  }
+
   return {
     logs,
     selectedId,
@@ -143,10 +175,14 @@ export const useFrpcStore = defineStore("frpc", () => {
     starting,
     stopping,
     isRunning,
+    canStart,
+    canStop,
     pushLog,
     clearLogs,
     init,
     start,
     stop,
+    ensureSelectedVersion,
+    startSelected,
   }
 })

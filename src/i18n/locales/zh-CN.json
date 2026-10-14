@@ -28,6 +28,19 @@
     "download": "Frpc 下载",
     "setting": "设置"
   },
+  "tray": {
+    "show": "显示窗口",
+    "start": "启动穿透",
+    "stop": "停止穿透",
+    "quit": "退出"
+  },
+  "closeDialog": {
+    "title": "关闭 Frpilot",
+    "tray": "最小化到系统托盘",
+    "trayDesc": "保持 Frpilot 在后台运行，可从系统托盘随时打开",
+    "exit": "直接退出",
+    "exitDesc": "停止穿透并完全退出 Frpilot"
+  },
   "system": {
     "cpu": "CPU 占用",
     "memory": "内存占用",

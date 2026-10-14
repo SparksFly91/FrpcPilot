@@ -28,6 +28,19 @@
     "download": "Download frpc",
     "setting": "Settings"
   },
+  "tray": {
+    "show": "Show window",
+    "start": "Start tunnel",
+    "stop": "Stop tunnel",
+    "quit": "Quit"
+  },
+  "closeDialog": {
+    "title": "Close Frpilot",
+    "tray": "Minimize to system tray",
+    "trayDesc": "Keep Frpilot running in the background; reopen it from the system tray",
+    "exit": "Quit directly",
+    "exitDesc": "Stop the tunnel and exit Frpilot completely"
+  },
   "system": {
     "cpu": "CPU usage",
     "memory": "Memory usage",

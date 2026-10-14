@@ -31,6 +31,28 @@ export async function closeWindow() {
   await win?.close()
 }
 
+/** 隐藏窗口（最小化到系统托盘，保持程序在后台运行） */
+export async function hideWindow() {
+  const win = await currentWindow()
+  await win?.hide()
+}
+
+/** 显示并聚焦窗口（从系统托盘恢复） */
+export async function revealWindow() {
+  const win = await currentWindow()
+  if (!win) return
+  await win.show()
+  await win.unminimize()
+  await win.setFocus()
+}
+
+/** 退出整个应用（退出前由调用方负责停止穿透等收尾工作） */
+export async function exitApp() {
+  if (!isTauri()) return
+  const { exit } = await import("@tauri-apps/plugin-process")
+  await exit(0)
+}
+
 /** 开始拖拽窗口（配合 data-tauri-drag-region 使用） */
 export async function startDragging() {
   const win = await currentWindow()
