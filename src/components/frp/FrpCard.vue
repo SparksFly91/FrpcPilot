@@ -1,5 +1,5 @@
 <template>
-  <a-card class="frp-card" :body-style="{ padding: '16px' }" hoverable>
+  <a-card class="glass-card" :body-style="{ padding: '16px' }" hoverable>
     <!-- 头部：版本 + 状态标签 -->
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0 flex-1">
@@ -162,14 +162,3 @@ function formatDate(value: string) {
   return value ? dayjs(value).format("YYYY-MM-DD") : "-"
 }
 </script>
-
-<style scoped lang="scss">
-.frp-card {
-  border-color: rgba(15, 23, 42, 0.08);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.dark .frp-card {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-</style>

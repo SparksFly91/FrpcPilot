@@ -1,5 +1,5 @@
 <template>
-  <a-card class="server-card" :body-style="{ padding: '16px' }" hoverable>
+  <a-card class="glass-card" :body-style="{ padding: '16px' }" hoverable>
     <!-- 头部：名称 + 状态标签 + 操作 -->
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0 flex-1">
@@ -88,14 +88,3 @@ function onEnabledChange(checked: SwitchValue) {
   emit("toggleEnabled", Boolean(checked))
 }
 </script>
-
-<style scoped lang="scss">
-.server-card {
-  border-color: rgba(15, 23, 42, 0.08);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.dark .server-card {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-</style>
