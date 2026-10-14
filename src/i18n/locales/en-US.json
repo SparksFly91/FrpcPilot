@@ -13,6 +13,7 @@
     "settings": "Settings",
     "minimize": "Minimize",
     "maximize": "Maximize",
+    "maximizeDisabled": "Maximizing is not needed on macOS",
     "restore": "Restore",
     "close": "Close"
   },

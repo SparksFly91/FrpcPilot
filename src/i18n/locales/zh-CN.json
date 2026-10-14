@@ -13,6 +13,7 @@
     "settings": "设置",
     "minimize": "最小化",
     "maximize": "最大化",
+    "maximizeDisabled": "macOS 下无需最大化窗口",
     "restore": "还原",
     "close": "关闭"
   },

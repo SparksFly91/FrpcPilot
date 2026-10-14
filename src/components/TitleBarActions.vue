@@ -68,8 +68,9 @@
       <template #icon><SettingOutlined /></template>
     </a-button>
 
-    <!-- 最小化 -->
+    <!-- 最小化（macOS 由左侧红绿灯负责，此处隐藏） -->
     <a-button
+      v-if="!isMac"
       type="text"
       class="tb-btn"
       :title="t('titlebar.minimize')"
@@ -78,8 +79,9 @@
       <template #icon><MinusOutlined /></template>
     </a-button>
 
-    <!-- 关闭 -->
+    <!-- 关闭（macOS 由左侧红绿灯负责，此处隐藏） -->
     <a-button
+      v-if="!isMac"
       type="text"
       class="tb-btn tb-btn-close"
       :title="t('titlebar.close')"
@@ -108,12 +110,14 @@ import { useUpdateStore } from "@/stores/update"
 import { languageOptions, type Language } from "@/i18n"
 import { closeWindow, minimizeWindow } from "@/utils/window"
 import { openProjectRepo } from "@/api/updater"
+import { usePlatform } from "@/composables/usePlatform"
 
 const emit = defineEmits<{ settings: [] }>()
 
 const { t } = useI18n()
 const appStore = useAppStore()
 const updateStore = useUpdateStore()
+const { isMac } = usePlatform()
 
 const onLanguageClick: MenuProps["onClick"] = ({ key }) => {
   appStore.setLanguage(key as Language)

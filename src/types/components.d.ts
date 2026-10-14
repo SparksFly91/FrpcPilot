@@ -43,6 +43,7 @@ declare module 'vue' {
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     FrpCard: typeof import('./../components/frp/FrpCard.vue')['default']
     MacTitleBar: typeof import('./../components/MacTitleBar.vue')['default']
+    MarkdownBlock: typeof import('./../components/MarkdownBlock.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ServerCard: typeof import('./../components/server/ServerCard.vue')['default']

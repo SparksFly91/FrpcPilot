@@ -27,18 +27,17 @@
         </svg>
       </button>
       <button
-        class="traffic-light bg-[#28c840]"
-        :class="{ 'traffic-light--idle': !focused }"
-        :title="t('titlebar.maximize')"
-        @click="toggleMaximizeWindow()"
+        class="traffic-light traffic-light--disabled bg-[#28c840]"
+        :title="t('titlebar.maximizeDisabled')"
+        disabled
       >
-        <svg viewBox="0 0 12 12" class="light-icon opacity-0 group-hover/lights:opacity-100">
+        <svg viewBox="0 0 12 12" class="light-icon opacity-0">
           <path d="M3.5 3.5h5v5h-5z" />
         </svg>
       </button>
     </div>
 
-    <!-- 右侧：语言 / 主题 / 设置 / 最小化 / 关闭 -->
+    <!-- 右侧：语言 / 主题 / 检查更新 / GitHub / 设置（最小化与关闭由左侧红绿灯负责） -->
     <TitleBarActions @settings="emit('settings')" />
   </div>
 </template>
@@ -46,7 +45,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
 import TitleBarActions from "./TitleBarActions.vue"
-import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "@/utils/window"
+import { closeWindow, minimizeWindow } from "@/utils/window"
 
 const emit = defineEmits<{ settings: [] }>()
 
@@ -77,6 +76,14 @@ const focused = useWindowFocus()
 /* 窗口失焦时红绿灯置灰（模拟 macOS 行为） */
 .traffic-light--idle {
   background-color: #cbd5e1 !important;
+}
+
+/* macOS 不需要最大化：绿灯禁用置灰 */
+.traffic-light--disabled,
+.traffic-light:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.35) brightness(1.05);
+  opacity: 0.55;
 }
 
 .light-icon {

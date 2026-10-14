@@ -31,7 +31,10 @@
       <BulbOutlined />
       <span>{{ t("update.log") }}</span>
     </div>
-    <div class="update-log">{{ logText }}</div>
+    <div class="update-log">
+      <MarkdownBlock v-if="hasLog" :source="info?.body" />
+      <p v-else class="m-0 opacity-80">{{ t("update.emptyLog") }}</p>
+    </div>
 
     <!-- 下载 / 安装进度 -->
     <div v-if="store.installing" class="update-progress">
@@ -62,6 +65,7 @@
 import dayjs from "dayjs"
 import { ArrowRightOutlined, BulbOutlined } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
+import MarkdownBlock from "@/components/MarkdownBlock.vue"
 import { useUpdateStore } from "@/stores/update"
 
 const { t } = useI18n()
@@ -75,7 +79,8 @@ const releaseDate = computed(() =>
   info.value?.date ? dayjs(info.value.date).format("YYYY-MM-DD") : "",
 )
 
-const logText = computed(() => info.value?.body?.trim() || t("update.emptyLog"))
+/** 是否存在可渲染的更新日志内容 */
+const hasLog = computed(() => Boolean(info.value?.body?.trim()))
 
 function onCancel() {
   store.cancel()
@@ -125,14 +130,11 @@ function onConfirm() {
 }
 
 .update-log {
-  white-space: pre-wrap;
   word-break: break-word;
   padding: 12px 14px;
   border-radius: 10px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(148, 163, 184, 0.12);
-  font-size: 13px;
-  line-height: 1.7;
   opacity: 0.9;
 }
 
