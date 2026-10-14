@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write # 需要写入权限来创建 Release
 
+env:
+  # 更新产物镜像前缀：latest.json 里的 GitHub 下载直链会被改写为 <前缀> + 原始直链。
+  # 更换镜像时，请同步修改 src-tauri/tauri.conf.json 中 updater.endpoints 的镜像地址。
+  MIRROR_PREFIX: "https://ghproxy.net/"
+
 jobs:
   publish-tauri:
     strategy:
@@ -132,3 +137,45 @@ jobs:
           releaseDraft: true # 先创建草稿，手动确认后再发布
           prerelease: false
           args: ${{ matrix.args }}
+
+  # 所有平台构建完成后，把 latest.json 里的下载直链改写为镜像前缀，
+  # 让「下载安装包」这一步也走镜像加速（此前只有检查更新走镜像）。
+  mirror-updater-manifest:
+    needs: publish-tauri
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Rewrite latest.json download URLs to mirror
+        run: |
+          set -euo pipefail
+          TAG="v$(node -p "require('./package.json').version")"
+          echo "Release tag: $TAG"
+
+          mkdir -p updater
+          # 从草稿 Release 中取回 tauri-action 生成的更新清单
+          gh release download "$TAG" --pattern latest.json --dir updater --clobber
+
+          node <<'NODE'
+          const fs = require("fs");
+          const file = "updater/latest.json";
+          const prefix = process.env.MIRROR_PREFIX;
+          const data = JSON.parse(fs.readFileSync(file, "utf8"));
+          let count = 0;
+          for (const info of Object.values(data.platforms || {})) {
+            if (info && typeof info.url === "string" && info.url.startsWith("https://github.com/")) {
+              info.url = prefix + info.url;
+              count += 1;
+            }
+          }
+          fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
+          console.log(`Rewrote ${count} download URL(s) with mirror prefix: ${prefix}`);
+          NODE
+
+          # 覆盖上传（签名针对安装包字节校验，与 URL 无关，改地址不影响更新校验）
+          gh release upload "$TAG" updater/latest.json --clobber
