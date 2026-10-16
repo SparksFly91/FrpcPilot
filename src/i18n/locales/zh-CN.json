@@ -39,7 +39,12 @@
     "tray": "最小化到系统托盘",
     "trayDesc": "保持 Frpilot 在后台运行，可从系统托盘随时打开",
     "exit": "直接退出",
-    "exitDesc": "停止穿透并完全退出 Frpilot"
+    "exitDesc": "停止穿透并完全退出 Frpilot",
+    "behavior": "关闭行为",
+    "ask": "每次询问",
+    "askDesc": "每次关闭都弹出此对话框，由你选择关闭方式",
+    "remember": "保持以上选择",
+    "rememberDesc": "记住上面的关闭方式，之后关闭不再询问"
   },
   "system": {
     "cpu": "CPU 占用",
@@ -73,8 +78,19 @@
     "title": "设置",
     "placeholder": "设置页面开发中，敬请期待。",
     "menu": {
+      "general": "常规",
       "appearance": "外观设置",
       "about": "关于"
+    },
+    "general": {
+      "title": "常规",
+      "subtitle": "关闭行为与应用语言等基础设置",
+      "closeBehavior": "关闭行为",
+      "closeBehaviorTip": "设置点击关闭按钮时的处理方式，与关闭弹窗中的选项保持一致",
+      "closeAction": "关闭方式",
+      "closeActionTip": "选择「保持以上选择」后生效，关闭窗口时将直接按此方式处理，同时也作为关闭弹窗的默认选项",
+      "language": "语言",
+      "languageTip": "切换界面显示语言，与顶部栏的语言切换保持同步"
     },
     "appearance": {
       "title": "外观设置",

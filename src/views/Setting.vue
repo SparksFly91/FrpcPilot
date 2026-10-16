@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { h } from "vue"
-import { BgColorsOutlined, InfoCircleOutlined } from "@ant-design/icons-vue"
+import { BgColorsOutlined, InfoCircleOutlined, SlidersOutlined } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
 import type { MenuProps } from "ant-design-vue"
 
@@ -31,6 +31,11 @@ const router = useRouter()
 const selectedKeys = computed(() => [route.path])
 
 const menuItems = computed<MenuProps["items"]>(() => [
+  {
+    key: "/setting/general",
+    icon: () => h(SlidersOutlined),
+    label: t("settings.menu.general"),
+  },
   {
     key: "/setting/appearance",
     icon: () => h(BgColorsOutlined),

@@ -45,6 +45,7 @@ declare module 'vue' {
     ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
+    CardRadioGroup: typeof import('./../components/CardRadioGroup.vue')['default']
     CloseConfirmModal: typeof import('./../components/CloseConfirmModal.vue')['default']
     FrpCard: typeof import('./../components/frp/FrpCard.vue')['default']
     MacTitleBar: typeof import('./../components/MacTitleBar.vue')['default']

@@ -36,9 +36,15 @@ const routes: RouteRecordRaw[] = [
                 path: "setting",
                 name: "Setting",
                 component: () => import("@/views/Setting.vue"),
-                redirect: "/setting/appearance",
+                redirect: "/setting/general",
                 meta: { title: "settings.title" },
                 children: [
+                    {
+                        path: "general",
+                        name: "General",
+                        component: () => import("@/views/setting/General.vue"),
+                        meta: { title: "settings.menu.general" },
+                    },
                     {
                         path: "appearance",
                         name: "Appearance",
