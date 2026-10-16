@@ -437,7 +437,7 @@ mod tests {
     #[test]
     fn falls_back_to_error_for_failed_lines() {
         assert_eq!(
-            detect_level("login to the server failed: dial tcp 47.113.122.255:7000"),
+            detect_level("login to the server failed: dial tcp 1.2.3.4:7000"),
             "ERROR"
         );
         assert_eq!(detect_level("connection timeout, retrying"), "INFO");

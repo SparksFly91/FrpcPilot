@@ -15,6 +15,8 @@
 
 </div>
 
+> 📘 **新手必读**：第一次搭建内网穿透？请阅读 **[《Frp 内网穿透搭建指南》](docs/Frp搭建内网穿透指南.md)** —— 从公网服务端搭建到用 FrpcPilot 一键开启穿透，手把手带你跑通第一个隧道。
+
 ---
 
 ## 🏷️ 关于「FrpcPilot」这个名字
@@ -128,6 +130,8 @@
 
 装好后打开应用即可，后续版本会在应用内自动检查并更新。
 
+> 🧭 **首次使用？** 还不清楚怎么搭建 frps 服务端、怎么配置隧道？请参考 [《Frp 内网穿透搭建指南》](docs/Frp搭建内网穿透指南.md)。
+
 ---
 
 ## 🧱 技术栈
@@ -228,6 +232,7 @@ FrpcPilot/
 │   └── tauri.macos.conf.json       # macOS 平台覆盖配置（透明圆角窗口）
 ├── docs/
 │   ├── CHANGELOG.md                # 版本更新日志（发布流程会读取）
+│   ├── Frp搭建内网穿透指南.md       # 内网穿透（frps + FrpcPilot）搭建教程
 │   └── snipastes/                  # 界面截图
 ├── .github/workflows/release.yml   # 多平台发布工作流
 ├── index.html
