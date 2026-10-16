@@ -88,7 +88,13 @@
       "none": "Default",
       "bg1": "Background 1",
       "bg2": "Background 2",
-      "bg3": "Background 3"
+      "bg3": "Background 3",
+      "bg4": "Background 4",
+      "bg5": "Background 5",
+      "bg6": "Background 6",
+      "bg7": "Background 7",
+      "bg8": "Background 8",
+      "bg9": "Background 9"
     }
   },
   "server": {

@@ -5,11 +5,45 @@ import { useFrpcStore } from "@/stores/frpc"
 import { useWindowStore } from "@/stores/window"
 import { isTauri } from "@/utils/window"
 
+/** 托盘图标固定 id（便于热更新 / 重载时清理残留的旧图标） */
+const TRAY_ID = "frpilot-tray"
+
 /** 是否已初始化，避免重复创建托盘 */
 let initialized = false
 
+/** 停止状态 / 语言监听，热更新时释放，避免旧实例订阅残留 */
+let stopWatchers: (() => void) | null = null
+
 function errMsg(e: unknown) {
   return e instanceof Error ? e.message : String(e)
+}
+
+/**
+ * 移除所有同 id 的残留托盘图标。
+ *
+ * Tauri 在 Rust 侧用 `Vec` 保存托盘图标，且 JS 资源不会随页面卸载 / GC 自动释放
+ * （官方文档明确说明 JS 无法在对象被回收时执行清理），因此开发时每次热更新或
+ * 页面重载都会保留旧图标并叠加出一个新的。创建前先按 id 清空，保证始终只有一个。
+ *
+ * `removeById` 在找不到对应托盘时会抛错，据此作为循环终止条件（同时兜底清理
+ * 先前已经叠加的多个图标）。
+ */
+async function removeExistingTrays(TrayIcon: typeof import("@tauri-apps/api/tray").TrayIcon) {
+  for (let i = 0; i < 10; i += 1) {
+    try {
+      await TrayIcon.removeById(TRAY_ID)
+    } catch {
+      break
+    }
+  }
+}
+
+// 开发模式热更新：模块被替换时释放监听，避免旧实例的订阅残留
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    stopWatchers?.()
+    stopWatchers = null
+  })
 }
 
 /**
@@ -42,6 +76,9 @@ async function createTray() {
       import("@tauri-apps/api/menu"),
       import("@tauri-apps/api/app"),
     ])
+
+  // 先清理开发时热更新 / 页面重载残留的托盘图标，避免叠加出多个
+  await removeExistingTrays(TrayIcon)
 
   // 显示窗口（始终可用）
   const showItem = await MenuItem.new({
@@ -86,7 +123,7 @@ async function createTray() {
   const icon = await defaultWindowIcon().catch(() => null)
 
   await TrayIcon.new({
-    id: "frpilot-tray",
+    id: TRAY_ID,
     icon: icon ?? undefined,
     tooltip: "Frpilot",
     menu,
@@ -101,7 +138,7 @@ async function createTray() {
   })
 
   // Frpc 运行状态变化时同步菜单可用状态
-  watch(
+  const stopStatusWatch = watch(
     [() => frpcStore.canStart, () => frpcStore.canStop],
     ([canStart, canStop]) => {
       void startItem.setEnabled(canStart)
@@ -110,7 +147,7 @@ async function createTray() {
   )
 
   // 语言切换时同步菜单文案
-  watch(
+  const stopTextWatch = watch(
     () => appStore.language,
     () => {
       void showItem.setText(translate("tray.show"))
@@ -119,6 +156,11 @@ async function createTray() {
       void quitItem.setText(translate("tray.quit"))
     },
   )
+
+  stopWatchers = () => {
+    stopStatusWatch()
+    stopTextWatch()
+  }
 }
 
 /** 托盘「启动穿透」：复用仪表盘的一键启动逻辑 */
