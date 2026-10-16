@@ -65,6 +65,9 @@ import { isTauri } from "@/utils/window"
 
 const { t } = useI18n()
 
+// 组件名需与路由 name 一致，以便被 Layout 的 <keep-alive :include> 缓存
+defineOptions({ name: "Download" })
+
 const loading = ref(false)
 const importing = ref(false)
 

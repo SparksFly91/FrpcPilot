@@ -9,7 +9,12 @@
       <Aside />
 
       <main class="min-w-0 flex-1 overflow-hidden">
-        <router-view />
+        <!-- 按路由 meta.isCache 决定是否缓存页面组件（keep-alive 不持久化，仅在应用运行时生效） -->
+        <router-view v-slot="{ Component }">
+          <keep-alive :include="cachedViews">
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
       </main>
     </div>
 
@@ -30,6 +35,19 @@ import { useUpdateStore } from "@/stores/update"
 
 const router = useRouter()
 const updateStore = useUpdateStore()
+
+/**
+ * 需要 keep-alive 缓存的页面组件名列表（由路由 meta.isCache 决定）。
+ *
+ * keep-alive 通过组件名匹配缓存，故约定：缓存页面的组件名需与路由 name 一致
+ * （页面通过 defineOptions({ name }) 显式声明）。
+ */
+const cachedViews = computed(() =>
+  router
+    .getRoutes()
+    .filter((record) => record.meta.isCache && record.name)
+    .map((record) => String(record.name)),
+)
 
 /** 点击标题栏“设置”按钮 → 跳转设置页 */
 function goToSetting() {
