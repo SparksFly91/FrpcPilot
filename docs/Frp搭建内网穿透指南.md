@@ -153,7 +153,7 @@ ufw allow 6001/tcp
 
 ### 2. 下载 frpc 客户端
 
-![Frpc下载](./snipastes/Frpc下载.webp)
+![Frpc下载](./snipastes/frpc下载.webp)
 
 1. 打开侧边栏「**Frpc 下载**」页面；
 2. 找到与**本机系统 / 架构**匹配的版本，点击「**下载**」，等待下载并自动解压完成（卡片会显示「已下载」）；
