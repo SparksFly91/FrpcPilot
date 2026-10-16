@@ -45,6 +45,27 @@ export const useAppStore = defineStore("app", () => {
     }
   })
 
+  // 磨砂玻璃透明度（0 - 100，数值越大越透明，持久化）
+  const cardTransparency = useStorage<number>("frpilot:card-transparency", 55)
+  const modalTransparency = useStorage<number>("frpilot:modal-transparency", 38)
+
+  /** 透明度百分比 → 背景 alpha（越大越透明，alpha 越小；并做范围兜底） */
+  function alphaFromTransparency(value: number) {
+    const percent = Math.min(100, Math.max(0, Number(value) || 0))
+    return (100 - percent) / 100
+  }
+
+  const cardAlpha = computed(() => alphaFromTransparency(cardTransparency.value))
+  const modalAlpha = computed(() => alphaFromTransparency(modalTransparency.value))
+
+  // 把透明度实时写入 <html> 的 CSS 变量，供磨砂玻璃样式（卡片 / 弹窗）即时生效
+  watchEffect(() => {
+    const root = document.documentElement
+    root.style.setProperty("--app-card-alpha", String(cardAlpha.value))
+    root.style.setProperty("--app-card-alpha-hover", String(Math.min(cardAlpha.value + 0.15, 0.95)))
+    root.style.setProperty("--app-modal-alpha", String(modalAlpha.value))
+  })
+
   // Frpc 运行状态（后续由后端驱动）
   const runStatus = ref<RunStatus>("stopped")
 
@@ -76,6 +97,8 @@ export const useAppStore = defineStore("app", () => {
     toggleDark,
     background,
     backgroundUrl,
+    cardTransparency,
+    modalTransparency,
     runStatus,
     antdLocale,
     setLanguage,

@@ -13,6 +13,12 @@ body,
 
 /* 窗口背景色与渐变（供 html / #app 复用，避免重复定义） */
 :root {
+  /* 全局文字颜色：普通 HTML 文本继承使用（Antd 组件由 CSS-in-JS 自行着色，不受影响） */
+  --app-text-color: rgba(15, 23, 42, 0.88);
+  /* 磨砂玻璃透明度：由「外观设置」实时写入 <html>，默认值与初始外观保持一致 */
+  --app-card-alpha: 0.45;
+  --app-card-alpha-hover: 0.62;
+  --app-modal-alpha: 0.62;
   --app-bg-color: #eef2ff;
   --app-bg-gradient:
     radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.28), transparent 60%),
@@ -21,6 +27,7 @@ body,
 }
 
 html.dark {
+  --app-text-color: rgba(226, 232, 240, 0.92);
   --app-bg-color: #0b1220;
   --app-bg-gradient:
     radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.35), transparent 60%),
@@ -85,6 +92,8 @@ body {
   overflow: hidden;
   font-family: 'Inter', 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 文字颜色跟随明暗主题，避免暗色下普通文本仍是浏览器默认黑色 */
+  color: var(--app-text-color);
   /* 背景交由 <html>（或 macOS 下的 #app）绘制，body 保持透明避免覆盖画布背景 */
   background-color: transparent;
 }
@@ -112,7 +121,7 @@ body {
 .glass-panel {
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, var(--app-card-alpha));
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
   box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
@@ -120,7 +129,7 @@ body {
 
 .dark .glass-panel {
   border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(15, 23, 42, var(--app-card-alpha));
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -131,7 +140,7 @@ body {
  */
 .glass-card.ant-card {
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  background: rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, var(--app-card-alpha)) !important;
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08) !important;
@@ -140,19 +149,19 @@ body {
 
 .glass-card.ant-card:hover {
   border-color: rgba(99, 102, 241, 0.45) !important;
-  background: rgba(255, 255, 255, 0.62) !important;
+  background: rgba(255, 255, 255, var(--app-card-alpha-hover)) !important;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14) !important;
 }
 
 .dark .glass-card.ant-card {
   border-color: rgba(255, 255, 255, 0.1) !important;
-  background: rgba(30, 41, 59, 0.5) !important;
+  background: rgba(30, 41, 59, var(--app-card-alpha)) !important;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35) !important;
 }
 
 .dark .glass-card.ant-card:hover {
   border-color: rgba(129, 140, 248, 0.5) !important;
-  background: rgba(30, 41, 59, 0.62) !important;
+  background: rgba(30, 41, 59, var(--app-card-alpha-hover)) !important;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45) !important;
 }
 
@@ -172,7 +181,7 @@ body {
   max-height: 80vh;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.62) !important;
+  background: rgba(255, 255, 255, var(--app-modal-alpha)) !important;
   backdrop-filter: blur(24px) saturate(170%);
   -webkit-backdrop-filter: blur(24px) saturate(170%);
   box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18) !important;
@@ -187,7 +196,7 @@ body {
 
 .dark .form-modal-wrap .ant-modal-content {
   border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(30, 41, 59, 0.62) !important;
+  background: rgba(30, 41, 59, var(--app-modal-alpha)) !important;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5) !important;
 }
 
@@ -217,7 +226,7 @@ body {
   max-height: 60vh;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.72) !important;
+  background: rgba(255, 255, 255, var(--app-modal-alpha)) !important;
   backdrop-filter: blur(24px) saturate(170%);
   -webkit-backdrop-filter: blur(24px) saturate(170%);
   box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18) !important;
@@ -232,7 +241,7 @@ body {
 
 .dark .update-modal-wrap .ant-modal-content {
   border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(30, 41, 59, 0.72) !important;
+  background: rgba(30, 41, 59, var(--app-modal-alpha)) !important;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5) !important;
 }
 

@@ -94,7 +94,12 @@
       "bg6": "Background 6",
       "bg7": "Background 7",
       "bg8": "Background 8",
-      "bg9": "Background 9"
+      "bg9": "Background 9",
+      "glass": "Glass transparency",
+      "glassTip": "Drag the sliders to adjust how transparent the cards and dialogs are. Higher values are more transparent.",
+      "cardTransparency": "Card transparency",
+      "modalTransparency": "Dialog transparency",
+      "previewTip": "Top preview shows cards, bottom shows dialogs — drag a slider to preview live."
     }
   },
   "server": {
