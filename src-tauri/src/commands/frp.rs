@@ -29,7 +29,7 @@ macro_rules! frp_fields {
 
 fn http_client() -> Result<reqwest::Client, reqwest::Error> {
     reqwest::Client::builder()
-        .user_agent("Frpilot/0.1 (+https://github.com/fatedier/frp)")
+        .user_agent("FrpcPilot/0.1 (+https://github.com/fatedier/frp)")
         .connect_timeout(Duration::from_secs(15))
         .build()
 }

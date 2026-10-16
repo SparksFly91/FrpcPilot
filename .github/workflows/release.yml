@@ -132,7 +132,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: v__VERSION__ # 自动替换为 src-tauri/tauri.conf.json（即 package.json）里的版本号
-          releaseName: "Frpilot v__VERSION__"
+          releaseName: "FrpcPilot v__VERSION__"
           releaseBody: ${{ steps.changelog.outputs.body }}
           releaseDraft: true # 先创建草稿，手动确认后再发布
           prerelease: false

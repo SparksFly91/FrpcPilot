@@ -29,7 +29,7 @@
         <div class="flex items-center gap-3">
           <GithubOutlined class="text-2xl" />
           <div class="min-w-0 flex-1">
-            <div class="truncate text-sm font-medium">SparksFly91 / Frpilot</div>
+            <div class="truncate text-sm font-medium">SparksFly91 / FrpcPilot</div>
             <div class="truncate text-xs opacity-60">{{ PROJECT_GITHUB_URL }}</div>
           </div>
           <a-button type="primary" size="small" :icon="h(LinkOutlined)" @click="onOpenRepo">

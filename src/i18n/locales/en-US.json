@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Frpilot",
+    "name": "FrpcPilot",
     "description": "A visual client for frpc"
   },
   "titlebar": {
@@ -35,11 +35,11 @@
     "quit": "Quit"
   },
   "closeDialog": {
-    "title": "Close Frpilot",
+    "title": "Close FrpcPilot",
     "tray": "Minimize to system tray",
-    "trayDesc": "Keep Frpilot running in the background; reopen it from the system tray",
+    "trayDesc": "Keep FrpcPilot running in the background; reopen it from the system tray",
     "exit": "Quit directly",
-    "exitDesc": "Stop the tunnel and exit Frpilot completely",
+    "exitDesc": "Stop the tunnel and exit FrpcPilot completely",
     "behavior": "Close behavior",
     "ask": "Ask every time",
     "askDesc": "Show this dialog on every close and let you choose",
@@ -69,7 +69,7 @@
     "clear": "Clear",
     "mock": "Mock data",
     "logEmpty": "No logs yet. Live logs will appear here once Frpc starts.",
-    "logReady": "Frpilot is ready. Waiting for Frpc to start.",
+    "logReady": "FrpcPilot is ready. Waiting for Frpc to start.",
     "logStarted": "Frpc {version} started",
     "logStopped": "Frpc stopped",
     "logStartFailed": "Failed to start Frpc: {message}"
@@ -255,10 +255,10 @@
     }
   },
   "about": {
-    "title": "About Frpilot",
+    "title": "About FrpcPilot",
     "subtitle": "A lightweight, friendly visual client for frp",
     "introTitle": "Introduction",
-    "intro": "Frpilot is a visual client for frp built with Tauri 2 + Vue 3 + TypeScript. Manage frpc versions, servers and tunnels through a friendly GUI — and say goodbye to hand-writing frpc.toml.",
+    "intro": "FrpcPilot is a visual client for frp built with Tauri 2 + Vue 3 + TypeScript. Manage frpc versions, servers and tunnels through a friendly GUI — and say goodbye to hand-writing frpc.toml.",
     "flowTitle": "How to use",
     "flow": {
       "step1Title": "Download frpc",

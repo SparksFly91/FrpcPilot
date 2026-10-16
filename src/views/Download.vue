@@ -72,9 +72,9 @@ const loading = ref(false)
 const importing = ref(false)
 
 /** 是否展示所有架构的 Frpc */
-const showAllArchFrpc = useStorage("frpilot:frp:allArchFrpc", false)
+const showAllArchFrpc = useStorage("frpcpilot:frp:allArchFrpc", false)
 /** 是否作为 frp 下载器展示所有架构的 Frps */
-const showAllArchFrps = useStorage("frpilot:frp:allArchFrps", false)
+const showAllArchFrps = useStorage("frpcpilot:frp:allArchFrps", false)
 
 /** 后端返回的全部发行包（含所有架构） */
 const allReleases = ref<FrpRelease[]>([])

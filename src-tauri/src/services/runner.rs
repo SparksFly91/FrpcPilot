@@ -1,7 +1,7 @@
 //! Frpc 进程管理。
 //!
 //! 通过 `std::process::Command` 直接拉起 frpc 可执行文件（**刻意绕开 plugin-shell**）：
-//! - frpc 与主进程互相独立，frpc 异常退出不会影响 Frpilot 本体；
+//! - frpc 与主进程互相独立，frpc 异常退出不会影响 FrpcPilot 本体；
 //! - Windows 下使用 `CREATE_NO_WINDOW` 启动，避免弹出黑色控制台窗口；
 //! - stdout / stderr 通过管道读取，按行解析后以 `frpc-log` 事件实时推送给前端；
 //! - 后台守护线程轮询子进程状态，退出时推送 `frpc-exit` 事件。

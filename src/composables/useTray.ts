@@ -6,7 +6,7 @@ import { useWindowStore } from "@/stores/window"
 import { isTauri } from "@/utils/window"
 
 /** 托盘图标固定 id（便于热更新 / 重载时清理残留的旧图标） */
-const TRAY_ID = "frpilot-tray"
+const TRAY_ID = "frpcpilot-tray"
 
 /** 是否已初始化，避免重复创建托盘 */
 let initialized = false
@@ -125,7 +125,7 @@ async function createTray() {
   await TrayIcon.new({
     id: TRAY_ID,
     icon: icon ?? undefined,
-    tooltip: "Frpilot",
+    tooltip: "FrpcPilot",
     menu,
     // 左键点击直接显示窗口，右键才弹出菜单
     showMenuOnLeftClick: false,

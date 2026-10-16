@@ -9,7 +9,7 @@
         alt=""
         draggable="false"
       />
-      <span class="text-sm font-semibold tracking-wide">Frpilot</span>
+      <span class="text-sm font-semibold tracking-wide">FrpcPilot</span>
     </div>
 
     <!-- 右侧：语言 / 主题 / 设置 / 最小化 / 关闭（macOS 下隐藏最小化与关闭） -->

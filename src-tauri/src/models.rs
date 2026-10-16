@@ -329,7 +329,7 @@ pub struct FrpcLogEvent {
     pub time: Option<String>,
     /// 日志级别：INFO / WARN / ERROR / DEBUG / TRACE
     pub level: String,
-    /// 来源：stdout / stderr / system（system 为 Frpilot 自身补充的日志）
+    /// 来源：stdout / stderr / system（system 为 FrpcPilot 自身补充的日志）
     pub source: String,
     /// 日志内容
     pub message: String,

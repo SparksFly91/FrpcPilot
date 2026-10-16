@@ -20,7 +20,7 @@ export interface UpdateInfo {
  */
 export const useUpdateStore = defineStore("update", () => {
   /** 用户选择「忽略该版本」后持久化的版本号，静默检查时不再提示 */
-  const ignoredVersion = useStorage<string>("frpilot:ignored-update", "")
+  const ignoredVersion = useStorage<string>("frpcpilot:ignored-update", "")
 
   const checking = ref(false)
   const installing = ref(false)

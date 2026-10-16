@@ -2,7 +2,7 @@ import type { Update } from "@tauri-apps/plugin-updater"
 import { isTauri } from "@/utils/window"
 
 /** 项目 GitHub 仓库地址（与 tauri.conf.json 中 updater 端点保持一致） */
-export const PROJECT_GITHUB_URL = "https://github.com/SparksFly91/Frpilot"
+export const PROJECT_GITHUB_URL = "https://github.com/SparksFly91/FrpcPilot"
 
 /**
  * 检查是否有可用更新。

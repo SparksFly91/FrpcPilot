@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Frpilot",
+  "productName": "FrpcPilot",
   "version": "../package.json",
-  "identifier": "Frpilot",
+  "identifier": "FrpcPilot",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Frpilot",
+        "title": "FrpcPilot",
         "width": 1100,
         "height": 720,
         "minWidth": 900,
@@ -42,8 +42,8 @@
       "active": true,
       "dialog": false,
       "endpoints": [
-        "https://ghproxy.net/https://github.com/SparksFly91/Frpilot/releases/latest/download/latest.json",
-        "https://github.com/SparksFly91/Frpilot/releases/latest/download/latest.json"
+        "https://ghproxy.net/https://github.com/SparksFly91/FrpcPilot/releases/latest/download/latest.json",
+        "https://github.com/SparksFly91/FrpcPilot/releases/latest/download/latest.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU0REVGMTREODFFOTI2MUEKUldRYUp1bUJUZkhlNU1qRmlPQm5xSmdQd24waFltVmNtTjlUallYVmdva1VGNkp5bTVGcVlsZUgK"
     }

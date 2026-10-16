@@ -24,9 +24,9 @@ export const useWindowStore = defineStore("window", () => {
   /** 关闭确认对话框是否打开 */
   const closeConfirmOpen = ref(false)
   /** 记住的关闭方式（弹窗默认选中项；「保持以上选择」时直接生效，持久化） */
-  const closeChoice = useStorage<CloseChoice>("frpilot:close-choice", "tray")
+  const closeChoice = useStorage<CloseChoice>("frpcpilot:close-choice", "tray")
   /** 关闭行为：每次询问 / 保持以上选择（持久化，默认每次询问） */
-  const closeBehavior = useStorage<CloseBehavior>("frpilot:close-behavior", "ask")
+  const closeBehavior = useStorage<CloseBehavior>("frpcpilot:close-behavior", "ask")
   /** 是否正在退出（停止穿透 + 退出软件） */
   const quitting = ref(false)
 

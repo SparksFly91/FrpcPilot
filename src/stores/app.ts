@@ -16,11 +16,11 @@ export type RunStatus = "running" | "error" | "stopped"
  */
 export const useAppStore = defineStore("app", () => {
   // 语言（持久化到 localStorage）
-  const language = useStorage<Language>("frpilot:language", "zh-CN")
+  const language = useStorage<Language>("frpcpilot:language", "zh-CN")
 
   // 明暗主题：useDark 会在 <html> 上切换 .dark 类名
   const isDark = useDark({
-    storageKey: "frpilot:theme",
+    storageKey: "frpcpilot:theme",
     selector: "html",
     attribute: "class",
     valueDark: "dark",
@@ -29,7 +29,7 @@ export const useAppStore = defineStore("app", () => {
   const toggleDark = useToggle(isDark)
 
   // 窗口背景图片（持久化）
-  const background = useStorage<BackgroundKey>("frpilot:background", DEFAULT_BACKGROUND)
+  const background = useStorage<BackgroundKey>("frpcpilot:background", DEFAULT_BACKGROUND)
   const backgroundUrl = computed(() => getBackgroundUrl(background.value))
 
   // 把背景图同步到 <html>（整窗背景，避免元素高度误差造成的上下留白）
@@ -46,8 +46,8 @@ export const useAppStore = defineStore("app", () => {
   })
 
   // 磨砂玻璃透明度（0 - 100，数值越大越透明，持久化）
-  const cardTransparency = useStorage<number>("frpilot:card-transparency", 55)
-  const modalTransparency = useStorage<number>("frpilot:modal-transparency", 38)
+  const cardTransparency = useStorage<number>("frpcpilot:card-transparency", 55)
+  const modalTransparency = useStorage<number>("frpcpilot:modal-transparency", 38)
 
   /** 透明度百分比 → 背景 alpha（越大越透明，alpha 越小；并做范围兜底） */
   function alphaFromTransparency(value: number) {

@@ -1,8 +1,26 @@
 # 更新日志
 
-本文件记录 Frpilot 各版本的更新内容。
+本文件记录 FrpcPilot 各版本的更新内容。
 
 ---
+
+## v1.2.1（2026-10-16）
+
+### 🔄 项目更名
+
+- 项目正式更名为 **FrpcPilot**：应用名称、安装包与可执行文件名、窗口标题、系统托盘提示、GitHub 仓库地址等全部由 `Frpilot` 更新为 `FrpcPilot`。
+- 构建与包标识同步调整：npm 包名改为 `frpcpilot`，Rust crate 改为 `frpcpilot` / `frpcpilot_lib`，Tauri `identifier` 改为 `FrpcPilot`。
+- 本地标识同步调整：本地存储键前缀改为 `frpcpilot:`，系统托盘 id 改为 `frpcpilot-tray`，数据库文件改为 `frpcpilot.db`。
+  - ⚠️ 由于 Tauri `identifier` 变更，应用数据目录随之变化，升级到本版本后需要**重新配置服务器与隧道**等本地数据。
+
+### 📝 文档
+
+- 重写 README，面向 GitHub 重新组织：新增项目徽章、项目简介、**「FrpcPilot」名称由来的介绍**、界面预览、下载安装、功能特性、开发指南与参与贡献等章节。
+- 更新界面截图，并新增「设置 · 常规」页面预览。
+
+### 🧱 工程
+
+- 应用版本升级至 **v1.2.1**。
 
 ## v1.2.0（2026-10-16）
 

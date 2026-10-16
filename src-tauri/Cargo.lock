@@ -1267,7 +1267,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "frpilot"
+name = "frpcpilot"
 version = "0.1.0"
 dependencies = [
  "chrono",

@@ -1,5 +1,5 @@
 [package]
-name = "frpilot"
+name = "frpcpilot"
 version = "0.1.0"
 description = "一个基于 Tauri 2 + Vue 3 + TypeScript 的 [frp](https://github.com/fatedier/frp) 可视化客户端，帮助用户快速配置 frpc 版本、服务器与隧道。"
 authors = ["SparksFly"]
@@ -11,7 +11,7 @@ edition = "2024"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "frpilot_lib"
+name = "frpcpilot_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [workspace]

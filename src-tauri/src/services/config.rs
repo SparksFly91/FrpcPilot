@@ -12,9 +12,9 @@ use crate::models::{Server, Tunnel};
 pub fn generate_frpc_config(server: &Server, tunnels: &[Tunnel]) -> String {
     let mut out = String::new();
 
-    out.push_str("# 该文件由 Frpilot 自动生成，请勿手动修改（重新启动 Frpc 会覆盖此文件）\n\n");
+    out.push_str("# 该文件由 FrpcPilot 自动生成，请勿手动修改（重新启动 Frpc 会覆盖此文件）\n\n");
 
-    // 日志：输出到控制台，由 Frpilot 采集并实时展示
+    // 日志：输出到控制台，由 FrpcPilot 采集并实时展示
     // 关闭 ANSI 颜色，避免日志中混入 `\x1b[1;34m` 之类的转义码
     out.push_str("log.to = \"console\"\n");
     out.push_str("log.level = \"info\"\n");
