@@ -8,6 +8,7 @@
     "opener:default",
     "updater:default",
     "process:default",
+    "autostart:default",
     "core:window:allow-start-dragging",
     "core:window:allow-minimize",
     "core:window:allow-unminimize",

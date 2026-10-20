@@ -28,6 +28,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init()) // 对话框插件
         .plugin(tauri_plugin_updater::Builder::new().build()) // 更新插件
         .plugin(tauri_plugin_process::init()) // 进程插件（更新后重启）
+        // 开机自启插件：读写系统启动项（Windows 注册表 Run 键 / macOS LaunchAgent / Linux XDG autostart）
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_prevent_default::Builder::new().build())
         .setup(|app| {
             let pool = tauri::async_runtime::block_on(async {

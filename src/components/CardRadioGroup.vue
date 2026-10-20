@@ -29,7 +29,7 @@ const model = defineModel<T>({ required: true })
 .card-radio-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   width: 100%;
 }
 
@@ -38,8 +38,8 @@ const model = defineModel<T>({ required: true })
   align-items: flex-start;
   width: 100%;
   margin-inline-end: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
   border: 1px solid rgba(15, 23, 42, 0.1);
   transition: border-color 0.2s ease, background-color 0.2s ease;
 
@@ -54,13 +54,13 @@ const model = defineModel<T>({ required: true })
   }
 
   :deep(.ant-radio) {
-    margin-top: 2px;
+    margin-top: 1px;
   }
 
   :deep(> span:last-child) {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 0;
     padding-inline-end: 0;
   }
 }
@@ -75,12 +75,14 @@ const model = defineModel<T>({ required: true })
 }
 
 .card-radio-title {
+  font-size: 13px;
   font-weight: 500;
+  line-height: 1.5;
 }
 
 .card-radio-desc {
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 11.5px;
+  line-height: 1.35;
   opacity: 0.6;
 }
 </style>

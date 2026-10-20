@@ -7,15 +7,16 @@
     :mask-closable="false"
     :closable="!store.quitting"
     :keyboard="!store.quitting"
+    :body-style="{ paddingTop: '10px', paddingBottom: '4px' }"
     @cancel="store.cancelClose()"
   >
     <!-- 关闭方式：最小化到系统托盘 / 直接退出 -->
     <CardRadioGroup v-model="draftChoice" :options="choiceOptions" :disabled="store.quitting" />
 
-    <a-divider class="!my-3" />
+    <a-divider class="close-divider" />
 
     <!-- 关闭行为：每次询问 / 保持以上选择 -->
-    <div class="mb-2 text-xs opacity-60">{{ t("closeDialog.behavior") }}</div>
+    <div class="mb-1.5 text-xs opacity-60">{{ t("closeDialog.behavior") }}</div>
     <CardRadioGroup v-model="draftBehavior" :options="behaviorOptions" :disabled="store.quitting" />
 
     <template #footer>
@@ -68,3 +69,10 @@ function onConfirm() {
   void store.confirmClose(draftChoice.value, draftBehavior.value)
 }
 </script>
+
+<style scoped>
+/* 弹窗内两组选项之间只留窄窄一段分隔，整体更紧凑 */
+.close-divider {
+  margin: 8px 0;
+}
+</style>

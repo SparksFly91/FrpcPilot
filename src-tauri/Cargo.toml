@@ -39,6 +39,7 @@ sysinfo = "0.39"
 tauri-plugin-dialog = "2.7.2"
 tauri-plugin-updater = "2.10.1"
 tauri-plugin-process = "2.3.1"
+tauri-plugin-autostart = "2"
 tauri-plugin-prevent-default = "6.0.1"
 reqwest = { version = "0.12", features = ["json", "stream"] }
 futures-util = "0.3"
