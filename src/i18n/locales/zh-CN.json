@@ -263,6 +263,10 @@
   "about": {
     "title": "关于 FrpcPilot",
     "subtitle": "轻量、顺手的 frp 可视化桌面客户端",
+    "versionTitle": "版本信息",
+    "currentVersion": "当前版本",
+    "checkUpdate": "检查更新",
+    "newVersion": "发现新版本 v{version}",
     "introTitle": "项目介绍",
     "intro": "FrpcPilot 是一个基于 Tauri 2 + Vue 3 + TypeScript 打造的 frp 可视化客户端，帮你用图形界面管理 frpc 版本、服务器与隧道，从此告别手写 frpc.toml。",
     "flowTitle": "使用流程",
@@ -279,10 +283,11 @@
     "repoTitle": "开源地址",
     "repoDesc": "欢迎 Star、提 Issue 或一起参与共建～",
     "openRepo": "打开 GitHub",
-    "versionTitle": "版本信息",
-    "currentVersion": "当前版本",
-    "checkUpdate": "检查更新",
-    "newVersion": "发现新版本 v{version}"
+    "contactTitle": "联系方式",
+    "contactDesc": "遇到问题或有新想法，欢迎通过邮箱或微信联系我，也可以在 GitHub 上提 Issue。",
+    "email": "邮箱",
+    "wechat": "微信",
+    "wechatTip": "扫码添加微信"
   },
   "update": {
     "title": "发现新版本 v{version} ✨",
@@ -302,6 +307,9 @@
     "developing": "功能开发中，敬请期待",
     "confirm": "确定",
     "cancel": "取消",
-    "save": "保存"
+    "save": "保存",
+    "copy": "复制",
+    "copySuccess": "已复制到剪贴板",
+    "copyFailed": "复制失败，请手动复制"
   }
 }

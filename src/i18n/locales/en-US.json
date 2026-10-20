@@ -263,6 +263,10 @@
   "about": {
     "title": "About FrpcPilot",
     "subtitle": "A lightweight, friendly visual client for frp",
+    "versionTitle": "Version",
+    "currentVersion": "Current version",
+    "checkUpdate": "Check for updates",
+    "newVersion": "New version v{version} is available",
     "introTitle": "Introduction",
     "intro": "FrpcPilot is a visual client for frp built with Tauri 2 + Vue 3 + TypeScript. Manage frpc versions, servers and tunnels through a friendly GUI — and say goodbye to hand-writing frpc.toml.",
     "flowTitle": "How to use",
@@ -279,10 +283,11 @@
     "repoTitle": "Open source",
     "repoDesc": "Stars, issues and contributions are all welcome~",
     "openRepo": "Open GitHub",
-    "versionTitle": "Version",
-    "currentVersion": "Current version",
-    "checkUpdate": "Check for updates",
-    "newVersion": "New version v{version} is available"
+    "contactTitle": "Contact",
+    "contactDesc": "Questions or ideas? Reach me by email or WeChat, or just open an issue on GitHub.",
+    "email": "Email",
+    "wechat": "WeChat",
+    "wechatTip": "Scan the QR code to add me"
   },
   "update": {
     "title": "New version v{version} is available ✨",
@@ -302,6 +307,9 @@
     "developing": "This feature is under construction",
     "confirm": "OK",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "copy": "Copy",
+    "copySuccess": "Copied to clipboard",
+    "copyFailed": "Copy failed, please copy manually"
   }
 }
