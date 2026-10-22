@@ -7,6 +7,12 @@ use tauri_helper::auto_collect_command;
 use crate::models::{ApiResponse, SystemDetails, SystemInfo};
 use crate::services::system::SystemStats;
 
+#[tauri::command]
+#[auto_collect_command]
+pub fn is_autostart_supported() -> bool {
+    !tauri::is_dev() && !cfg!(debug_assertions)
+}
+
 /// 获取系统资源占用（CPU / 内存百分比）
 #[tauri::command]
 #[auto_collect_command]

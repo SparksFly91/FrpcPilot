@@ -88,6 +88,7 @@
       "autostart": "Launch at startup",
       "autostartTip": "Start FrpcPilot automatically after you sign in. The switch writes straight to the system startup entry.",
       "autostartUnsupported": "System startup entries are not accessible here, so this setting is unavailable.",
+      "autostartRequiresRelease": "Enable launch at startup in a release build. Development builds require a local server and cannot run independently after a restart.",
       "autostartEnabled": "Launch at startup enabled",
       "autostartDisabled": "Launch at startup disabled",
       "autostartFailed": "Failed to update launch at startup: {message}",

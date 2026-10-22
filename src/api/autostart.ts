@@ -1,4 +1,10 @@
 import { isTauri } from "@/utils/window"
+import { invoke } from "@tauri-apps/api/core"
+
+export async function isAutostartSupported(): Promise<boolean> {
+  if (!isTauri()) return false
+  return invoke<boolean>("is_autostart_supported")
+}
 
 /**
  * 开机自启封装（Tauri 官方 autostart 插件）。

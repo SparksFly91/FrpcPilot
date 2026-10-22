@@ -81,9 +81,11 @@ const languageRadios = languageOptions.map((item) => ({ label: item.label, value
 
 /** 无法访问系统启动项时（非桌面环境）给出说明，避免开关无故置灰 */
 const autostartTip = computed(() =>
-  autostartStore.supported
-    ? t("settings.general.autostartTip")
-    : t("settings.general.autostartUnsupported"),
+  autostartStore.requiresRelease
+    ? t("settings.general.autostartRequiresRelease")
+    : autostartStore.supported
+      ? t("settings.general.autostartTip")
+      : t("settings.general.autostartUnsupported"),
 )
 
 /** 切换开机自启：失败时由 store 回滚开关状态并提示原因 */

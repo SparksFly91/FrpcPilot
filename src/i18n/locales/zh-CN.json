@@ -88,6 +88,7 @@
       "autostart": "开机自启",
       "autostartTip": "登录系统后自动启动 FrpcPilot，开关状态直接写入系统启动项",
       "autostartUnsupported": "当前环境无法读写系统启动项，暂不支持该设置",
+      "autostartRequiresRelease": "请在正式构建的应用中开启自启；开发版本依赖本地服务，无法在重启后独立运行",
       "autostartEnabled": "已开启开机自启",
       "autostartDisabled": "已关闭开机自启",
       "autostartFailed": "设置开机自启失败：{message}",

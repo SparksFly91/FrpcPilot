@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
 import { message } from "ant-design-vue"
 import { isTauri } from "@/utils/window"
-import { isAutostartEnabled, setAutostartEnabled } from "@/api/autostart"
+import { isAutostartEnabled, isAutostartSupported, setAutostartEnabled } from "@/api/autostart"
 import { translate } from "@/i18n"
 
 /**
@@ -17,7 +17,8 @@ export const useAutostartStore = defineStore("autostart", () => {
   /** 读取 / 写入系统启动项期间显示加载态，同时防止重复操作 */
   const loading = ref(isTauri())
   /** 当前环境能否读写系统启动项 */
-  const supported = ref(isTauri())
+  const supported = ref(false)
+  const requiresRelease = ref(false)
 
   function errMsg(e: unknown) {
     return e instanceof Error ? e.message : String(e)
@@ -28,6 +29,12 @@ export const useAutostartStore = defineStore("autostart", () => {
     if (!isTauri()) return
     loading.value = true
     try {
+      requiresRelease.value = !(await isAutostartSupported())
+      if (requiresRelease.value) {
+        enabled.value = false
+        supported.value = false
+        return
+      }
       enabled.value = await isAutostartEnabled()
       supported.value = true
     } catch {
@@ -61,5 +68,5 @@ export const useAutostartStore = defineStore("autostart", () => {
     }
   }
 
-  return { enabled, loading, supported, refresh, toggle }
+  return { enabled, loading, supported, requiresRelease, refresh, toggle }
 })

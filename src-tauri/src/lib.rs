@@ -3,6 +3,7 @@ mod models;
 mod services;
 
 use tauri::{Manager, RunEvent};
+use tauri_plugin_autostart::ManagerExt as _;
 
 use crate::commands::frp::{
     delete_frp, download_frp, get_frp_downloads, get_frp_releases, import_frp,
@@ -12,7 +13,7 @@ use crate::commands::server::{
     create_server, delete_server, get_server_list, set_server_enabled, set_server_pinned,
     update_server,
 };
-use crate::commands::system::{get_system_details, get_system_info};
+use crate::commands::system::{get_system_details, get_system_info, is_autostart_supported};
 use crate::commands::tunnel::{
     create_tunnel, delete_tunnel, get_tunnel_list, set_tunnel_enabled, set_tunnel_pinned,
     update_tunnel,
@@ -23,18 +24,39 @@ use crate::services::system::SystemStats;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let app = tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init()) // 对话框插件
         .plugin(tauri_plugin_updater::Builder::new().build()) // 更新插件
         .plugin(tauri_plugin_process::init()) // 进程插件（更新后重启）
-        // 开机自启插件：读写系统启动项（Windows 注册表 Run 键 / macOS LaunchAgent / Linux XDG autostart）
-        .plugin(tauri_plugin_autostart::init(
+        .plugin(tauri_plugin_prevent_default::Builder::new().build());
+
+    // Development executables require Vite; debug builds also open a Windows console.
+    if is_autostart_supported() {
+        builder = builder.plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
-        ))
-        .plugin(tauri_plugin_prevent_default::Builder::new().build())
+        ));
+    }
+
+    let app = builder
         .setup(|app| {
+            // The plugin resolves the running executable dynamically. Refresh enabled
+            // entries after reinstalling or moving the app, preserving disabled state.
+            if is_autostart_supported() {
+                let autostart = app.autolaunch();
+                let result = autostart.is_enabled().and_then(|enabled| {
+                    if enabled {
+                        autostart.enable()
+                    } else {
+                        Ok(())
+                    }
+                });
+                if let Err(error) = result {
+                    eprintln!("Failed to refresh autostart executable path: {error}");
+                }
+            }
+
             let pool = tauri::async_runtime::block_on(async {
                 init_pool(app.handle())
                     .await
