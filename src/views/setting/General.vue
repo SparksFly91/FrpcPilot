@@ -15,14 +15,16 @@
     <a-divider class="general-divider" />
 
     <!-- 语言：与顶部栏语言切换共用同一状态 -->
-    <section>
-      <div class="mb-1 text-sm font-medium">{{ t("settings.general.language") }}</div>
-      <p class="mb-2 text-xs opacity-60">{{ t("settings.general.languageTip") }}</p>
-      <a-radio-group
+    <section class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <div class="text-sm font-medium">{{ t("settings.general.language") }}</div>
+        <p class="mt-1 text-xs opacity-60">{{ t("settings.general.languageTip") }}</p>
+      </div>
+      <a-select
         v-model:value="appStore.language"
-        :options="languageRadios"
-        option-type="button"
-        button-style="solid"
+        :options="languageSelectOptions"
+        :aria-label="t('settings.general.language')"
+        class="w-36 shrink-0"
       />
     </section>
     
@@ -91,7 +93,7 @@ const choiceOptions = computed(() => [
 ])
 
 /** 语言选项与顶部栏共用 languageOptions，保证两端一致 */
-const languageRadios = languageOptions.map((item) => ({ label: item.label, value: item.key }))
+const languageSelectOptions = languageOptions.map((item) => ({ label: item.label, value: item.key }))
 
 /** 无法访问系统启动项时（非桌面环境）给出说明，避免开关无故置灰 */
 const autostartTip = computed(() =>

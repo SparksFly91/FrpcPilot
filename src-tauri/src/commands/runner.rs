@@ -12,6 +12,7 @@ use tauri_helper::auto_collect_command;
 use crate::models::{ApiResponse, FrpDownload, FrpcStatus, Server, Tunnel};
 use crate::services::config::generate_frpc_config;
 use crate::services::runner::FrpcRunner;
+use crate::services::storage::StoragePaths;
 
 // 统一查询字段，使用 concat! 保证结果为 'static str（sqlx 0.9 要求）
 macro_rules! server_fields {
@@ -32,14 +33,9 @@ macro_rules! download_fields {
     };
 }
 
-/// 本次运行生成的 frpc.toml 路径（应用数据目录/frp/run/frpc.toml）
+/// 本次运行生成的 frpc.toml 路径（安装目录/run/frpc.toml）
 fn config_file_path(app: &AppHandle) -> Result<PathBuf, String> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?
-        .join("frp")
-        .join("run");
+    let dir = app.state::<StoragePaths>().run();
     std::fs::create_dir_all(&dir).map_err(|e| format!("创建配置目录失败：{e}"))?;
     Ok(dir.join("frpc.toml"))
 }
@@ -77,7 +73,12 @@ pub async fn start_frpc(
     .await
     {
         Ok(Some(row)) => row,
-        Ok(None) => return Ok(ApiResponse::error(404, "所选 Frpc 版本不存在，请刷新后重试")),
+        Ok(None) => {
+            return Ok(ApiResponse::error(
+                404,
+                "所选 Frpc 版本不存在，请刷新后重试",
+            ));
+        }
         Err(e) => return Ok(ApiResponse::error(500, &e.to_string())),
     };
 

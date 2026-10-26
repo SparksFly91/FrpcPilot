@@ -1,4 +1,5 @@
 import { defineStore } from "pinia"
+import { preferences, flushPreferences } from "@/utils/preferences"
 import { message } from "ant-design-vue"
 import type { Update } from "@tauri-apps/plugin-updater"
 import { checkForAppUpdate, relaunchApp } from "@/api/updater"
@@ -20,7 +21,7 @@ export interface UpdateInfo {
  */
 export const useUpdateStore = defineStore("update", () => {
   /** 用户选择「忽略该版本」后持久化的版本号，静默检查时不再提示 */
-  const ignoredVersion = useStorage<string>("frpcpilot:ignored-update", "")
+  const ignoredVersion = useStorage<string>("frpcpilot:ignored-update", "", preferences)
 
   const checking = ref(false)
   const installing = ref(false)
@@ -137,6 +138,7 @@ export const useUpdateStore = defineStore("update", () => {
     installing.value = true
     resetProgress()
     try {
+      await flushPreferences()
       await pending.downloadAndInstall((event) => {
         switch (event.event) {
           case "Started":

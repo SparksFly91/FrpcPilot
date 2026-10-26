@@ -12,6 +12,7 @@ use tokio::io::AsyncWriteExt;
 use crate::models::{
     ApiResponse, FrpDownload, FrpDownloadPayload, FrpDownloadProgress, FrpRelease,
 };
+use crate::services::storage::StoragePaths;
 
 /// GitHub 镜像加速前缀（国内访问 GitHub 不稳定，拉取版本与下载统一走镜像）
 const GITHUB_MIRROR: &str = "https://gh-proxy.com/";
@@ -133,14 +134,31 @@ async fn fetch_releases(client: &reqwest::Client) -> Result<Vec<Value>, String> 
     Err(format!("获取 Frp 版本列表失败：{last_err}"))
 }
 
-/// 应用数据目录下的 frp 版本存储根目录
+/// 安装目录下的 frp 版本存储根目录
 fn versions_dir(app: &AppHandle) -> Result<PathBuf, String> {
-    Ok(app
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?
-        .join("frp")
-        .join("versions"))
+    Ok(app.state::<StoragePaths>().versions())
+}
+
+fn version_directory(version: &str) -> String {
+    if version != "."
+        && version != ".."
+        && !version.is_empty()
+        && version
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_'))
+    {
+        version.to_string()
+    } else {
+        // 将任意 Unicode 文件名编码为十六进制，保证导入目录名称唯一。
+        format!(
+            "import-{}",
+            version
+                .as_bytes()
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect::<String>()
+        )
+    }
 }
 
 /// 发送下载进度事件
@@ -153,7 +171,9 @@ fn emit_progress(
     message: Option<&str>,
 ) {
     let percent = if total > 0 {
-        ((downloaded as f64 / total as f64) * 100.0).clamp(0.0, 100.0).round() as u8
+        ((downloaded as f64 / total as f64) * 100.0)
+            .clamp(0.0, 100.0)
+            .round() as u8
     } else {
         0
     };
@@ -219,7 +239,10 @@ pub async fn get_frp_releases(
         };
 
         for asset in assets {
-            let name = asset.get("name").and_then(Value::as_str).unwrap_or_default();
+            let name = asset
+                .get("name")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
             let Some((_v, os, arch)) = parse_asset(name) else {
                 continue;
             };
@@ -510,7 +533,9 @@ fn find_binary(dir: &Path, stem: &str) -> Option<PathBuf> {
                 stack.push(path);
                 continue;
             }
-            let Some(name) = path.file_name().map(|s| s.to_string_lossy().to_ascii_lowercase())
+            let Some(name) = path
+                .file_name()
+                .map(|s| s.to_string_lossy().to_ascii_lowercase())
             else {
                 continue;
             };
@@ -558,10 +583,12 @@ pub async fn delete_frp(
     };
 
     if let Ok(base) = versions_dir(&app) {
-        let ver_dir = base.join(&row.version);
+        let ver_dir = base.join(version_directory(&row.version));
         let _ = tokio::fs::remove_dir_all(ver_dir.join(&row.platform)).await;
         if let Some(archive) = &row.archive_path {
-            let _ = tokio::fs::remove_file(archive).await;
+            if Path::new(archive).starts_with(&base) {
+                let _ = tokio::fs::remove_file(archive).await;
+            }
         }
         // 版本目录已空则一并删除
         if let Ok(mut entries) = tokio::fs::read_dir(&ver_dir).await {
@@ -570,7 +597,6 @@ pub async fn delete_frp(
             }
         }
     }
-
     match sqlx::query("DELETE FROM frp_downloads WHERE id = ?")
         .bind(id)
         .execute(&*state)
@@ -581,7 +607,7 @@ pub async fn delete_frp(
     }
 }
 
-/// 导入本地已下载的 frpc / frps（记录可执行文件路径，不复制文件）
+/// 导入本地 frpc / frps，将副本保存到安装目录，原始文件保持不变。
 #[tauri::command]
 #[auto_collect_command]
 pub async fn import_frp(
@@ -612,11 +638,33 @@ pub async fn import_frp(
             .file_name()
             .map(|s| s.to_string_lossy().to_string())
             .unwrap_or_default();
-        let size = std::fs::metadata(&path).map(|m| m.len() as i64).unwrap_or(0);
+        let size = std::fs::metadata(&path)
+            .map(|m| m.len() as i64)
+            .unwrap_or(0);
         let lower = file_name.to_ascii_lowercase();
         let is_frps = lower.contains("frps");
         let version = parse_version(&file_name).unwrap_or_else(|| file_name.clone());
-        let full = path.to_string_lossy().to_string();
+        let binary_name = if is_frps { "frps" } else { "frpc" };
+        // 对用户选择的文件名进行编码后再构造存储目录。
+        let import_dir = versions_dir(&app)?
+            .join(version_directory(&version))
+            .join(&platform)
+            .join("import");
+        std::fs::create_dir_all(&import_dir).map_err(|e| e.to_string())?;
+        let destination = import_dir.join(if cfg!(windows) {
+            format!("{binary_name}.exe")
+        } else {
+            binary_name.to_string()
+        });
+        let same_file = match (std::fs::canonicalize(&destination), std::fs::canonicalize(&path)) {
+            (Ok(destination), Ok(source)) => destination == source,
+            _ => false,
+        };
+        if !same_file {
+            std::fs::copy(&path, &destination).map_err(|e| format!("导入 Frp 失败：{e}"))?;
+        }
+        make_executable(&destination);
+        let full = destination.to_string_lossy().to_string();
         let (frpc_path, frps_path) = if is_frps {
             (None, Some(full))
         } else {
@@ -683,7 +731,10 @@ mod tests {
 
     #[test]
     fn parse_version_extracts_semver() {
-        assert_eq!(parse_version("frpc_0.71.0_windows_amd64.exe"), Some("v0.71.0".into()));
+        assert_eq!(
+            parse_version("frpc_0.71.0_windows_amd64.exe"),
+            Some("v0.71.0".into())
+        );
         assert_eq!(parse_version("frps-v0.60.0"), Some("v0.60.0".into()));
         assert_eq!(parse_version("frpc.exe"), None);
         assert_eq!(parse_version("frpc_0.71.exe"), None);

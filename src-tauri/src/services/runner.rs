@@ -97,8 +97,8 @@ impl FrpcRunner {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
 
-        // 工作目录设为 frpc 所在目录，保证其相对路径配置可正常解析
-        if let Some(dir) = exe.parent() {
+        // 相对路径的运行产物统一保存在生成配置所在的目录。
+        if let Some(dir) = Path::new(config_path).parent() {
             command.current_dir(dir);
         }
 

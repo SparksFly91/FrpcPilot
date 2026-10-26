@@ -3,6 +3,8 @@
  * 在纯浏览器环境（非 Tauri）下调用会被安全忽略，方便 `pnpm dev` 调试。
  */
 
+import { flushPreferences } from "@/utils/preferences"
+
 export function isTauri() {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
 }
@@ -49,6 +51,7 @@ export async function revealWindow() {
 /** 退出整个应用（退出前由调用方负责停止穿透等收尾工作） */
 export async function exitApp() {
   if (!isTauri()) return
+  await flushPreferences()
   const { exit } = await import("@tauri-apps/plugin-process")
   await exit(0)
 }

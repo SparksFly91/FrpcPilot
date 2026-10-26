@@ -1,4 +1,5 @@
 import { defineStore } from "pinia"
+import { preferences } from "@/utils/preferences"
 import zhCN from "ant-design-vue/es/locale/zh_CN"
 import enUS from "ant-design-vue/es/locale/en_US"
 import { setI18nLanguage, type Language } from "@/i18n"
@@ -15,13 +16,14 @@ export type RunStatus = "running" | "error" | "stopped"
  * 全局应用配置：语言、主题、窗口背景、Frpc 运行状态
  */
 export const useAppStore = defineStore("app", () => {
-  // 语言（持久化到 localStorage）
-  const language = useStorage<Language>("frpcpilot:language", "zh-CN")
+  // 安装目录内的持久化设置
+  const language = useStorage<Language>("frpcpilot:language", "zh-CN", preferences)
 
-  const sidebarCollapsed = useStorage("frpcpilot:sidebar-collapsed", false)
+  const sidebarCollapsed = useStorage("frpcpilot:sidebar-collapsed", false, preferences)
 
   // 明暗主题：useDark 会在 <html> 上切换 .dark 类名
   const isDark = useDark({
+    storage: preferences,
     storageKey: "frpcpilot:theme",
     selector: "html",
     attribute: "class",
@@ -31,7 +33,7 @@ export const useAppStore = defineStore("app", () => {
   const toggleDark = useToggle(isDark)
 
   // 窗口背景图片（持久化）
-  const background = useStorage<BackgroundKey>("frpcpilot:background", DEFAULT_BACKGROUND)
+  const background = useStorage<BackgroundKey>("frpcpilot:background", DEFAULT_BACKGROUND, preferences)
   const backgroundUrl = computed(() => getBackgroundUrl(background.value))
 
   // 把背景图同步到 <html>（整窗背景，避免元素高度误差造成的上下留白）
@@ -48,8 +50,8 @@ export const useAppStore = defineStore("app", () => {
   })
 
   // 磨砂玻璃透明度（0 - 100，数值越大越透明，持久化）
-  const cardTransparency = useStorage<number>("frpcpilot:card-transparency", 55)
-  const modalTransparency = useStorage<number>("frpcpilot:modal-transparency", 38)
+  const cardTransparency = useStorage<number>("frpcpilot:card-transparency", 55, preferences)
+  const modalTransparency = useStorage<number>("frpcpilot:modal-transparency", 38, preferences)
 
   /** 透明度百分比 → 背景 alpha（越大越透明，alpha 越小；并做范围兜底） */
   function alphaFromTransparency(value: number) {
