@@ -22,7 +22,7 @@ async function call<T>(command: string, args?: Record<string, unknown>): Promise
 }
 
 /**
- * 获取 Frp 版本列表（返回所有架构，前端按开关过滤）
+ * 获取 Frp 版本列表（返回所有架构，前端按平台筛选）
  */
 export function getFrpReleases() {
   return call<FrpRelease[]>("get_frp_releases")

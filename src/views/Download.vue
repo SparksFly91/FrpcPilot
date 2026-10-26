@@ -10,13 +10,15 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-        <label class="flex cursor-pointer items-center gap-2 text-xs">
-          <a-switch v-model:checked="showAllArchFrpc" size="small" />
-          <span>{{ t("frp.showAllArchFrpc") }}</span>
-        </label>
-        <label class="flex cursor-pointer items-center gap-2 text-xs">
-          <a-switch v-model:checked="showAllArchFrps" size="small" />
-          <span>{{ t("frp.showAllArchFrps") }}</span>
+        <label class="flex items-center gap-2 text-xs">
+          <span class="shrink-0 opacity-70">{{ t("frp.platformFilter") }}</span>
+          <a-select
+            v-model:value="selectedPlatform"
+            :aria-label="t('frp.platformFilter')"
+            :options="platformOptions"
+            class="w-44"
+            size="small"
+          />
         </label>
 
         <a-space>
@@ -41,7 +43,6 @@
             :key="`${item.version}-${item.platform}-${item.file_name}`"
             :release="item"
             :progress="progressMap[item.file_name]"
-            :show-frps="showAllArchFrps"
             @download="onDownload(item)"
             @copy="onCopy(item)"
             @delete="onDelete(item)"
@@ -71,21 +72,46 @@ defineOptions({ name: "Download" })
 const loading = ref(false)
 const importing = ref(false)
 
-/** 是否展示所有架构的 Frpc */
-const showAllArchFrpc = useStorage("frpcpilot:frp:allArchFrpc", false)
-/** 是否作为 frp 下载器展示所有架构的 Frps */
-const showAllArchFrps = useStorage("frpcpilot:frp:allArchFrps", false)
+const ALL_PLATFORMS = "all"
+const selectedPlatform = ref(ALL_PLATFORMS)
+const platformInitialized = ref(false)
 
 /** 后端返回的全部发行包（含所有架构） */
 const allReleases = ref<FrpRelease[]>([])
 
 /**
- * 按开关过滤后的展示列表：
- * 默认仅展示当前运行平台（以及已下载的记录）；开启任一开关后展示所有架构。
+ * 从发行包数据中生成平台筛选项，首项固定为“全部”。
  */
+const platformOptions = computed(() => [
+  { value: ALL_PLATFORMS, label: t("frp.allPlatforms") },
+  ...Array.from(new Set(allReleases.value.map((item) => item.platform)))
+    .sort((a, b) => a.localeCompare(b))
+    .map((platform) => ({ value: platform, label: platform })),
+])
+
+/** 按版本降序排列；同版本按平台稳定排序，保证“全部”视图按版本分组展示。 */
+function compareReleases(a: FrpRelease, b: FrpRelease) {
+  const aVersion = (a.version.match(/\d+/g) ?? []).slice(0, 3).map(Number)
+  const bVersion = (b.version.match(/\d+/g) ?? []).slice(0, 3).map(Number)
+  for (let index = 0; index < 3; index += 1) {
+    const difference = (bVersion[index] ?? 0) - (aVersion[index] ?? 0)
+    if (difference !== 0) return difference
+  }
+
+  return (
+    b.published_at.localeCompare(a.published_at) ||
+    a.platform.localeCompare(b.platform) ||
+    a.file_name.localeCompare(b.file_name)
+  )
+}
+
 const releases = computed(() => {
-  if (showAllArchFrpc.value || showAllArchFrps.value) return allReleases.value
-  return allReleases.value.filter((item) => item.is_current || item.downloaded)
+  const filtered =
+    selectedPlatform.value === ALL_PLATFORMS
+      ? allReleases.value
+      : allReleases.value.filter((item) => item.platform === selectedPlatform.value)
+
+  return [...filtered].sort(compareReleases)
 })
 
 /** 各发行包的下载进度（以文件名为键） */
@@ -101,6 +127,16 @@ async function refresh(silent = false) {
   if (!silent) loading.value = true
   try {
     allReleases.value = (await getFrpReleases()) ?? []
+    if (!platformInitialized.value) {
+      selectedPlatform.value =
+        allReleases.value.find((item) => item.is_current)?.platform ?? ALL_PLATFORMS
+      platformInitialized.value = true
+    } else if (
+      selectedPlatform.value !== ALL_PLATFORMS &&
+      !allReleases.value.some((item) => item.platform === selectedPlatform.value)
+    ) {
+      selectedPlatform.value = ALL_PLATFORMS
+    }
   } catch (e) {
     message.error(errMsg(e))
   } finally {

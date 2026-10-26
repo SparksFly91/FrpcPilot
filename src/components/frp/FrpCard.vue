@@ -11,7 +11,7 @@
         <div class="mt-1 flex flex-wrap items-center gap-2">
           <a-tag color="blue" class="!me-0">{{ release.platform }}</a-tag>
           <a-tag class="!me-0">frpc</a-tag>
-          <a-tag v-if="showFrps" color="cyan" class="!me-0">frps</a-tag>
+          <a-tag color="cyan" class="!me-0">frps</a-tag>
         </div>
       </div>
     </div>
@@ -93,7 +93,6 @@ import type { FrpDownloadProgress, FrpRelease } from "@/types/frp"
 const props = defineProps<{
   release: FrpRelease
   progress?: FrpDownloadProgress | null
-  showFrps?: boolean
 }>()
 
 const emit = defineEmits<{

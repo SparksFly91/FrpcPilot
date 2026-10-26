@@ -174,8 +174,8 @@ fn emit_progress(
 
 /// 获取 Frp 版本列表（返回所有架构的发行包，并合并本机已下载 / 已导入记录）
 ///
-/// 前端根据「展示所有架构的 Frpc / Frps」开关在本地过滤，避免频繁请求
-/// GitHub API 触发限流；默认仅展示当前运行平台由前端完成。
+/// 前端根据平台下拉列表在本地过滤，避免频繁请求 GitHub API 触发限流；
+/// 默认仅展示当前运行平台由前端完成。
 #[tauri::command]
 #[auto_collect_command]
 pub async fn get_frp_releases(

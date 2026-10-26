@@ -25,7 +25,7 @@
     "dashboard": "仪表盘",
     "servers": "服务器",
     "tunnels": "隧道列表",
-    "download": "Frpc 下载",
+    "download": "Frp下载",
     "setting": "设置"
   },
   "tray": {
@@ -62,7 +62,7 @@
     "arch": "系统架构",
     "ip": "IP 地址",
     "frpcVersion": "Frpc 版本",
-    "frpcVersionEmpty": "暂无已下载版本，请先前往 Frpc 下载页面下载",
+    "frpcVersionEmpty": "暂无已下载版本，请先前往 Frp下载页面下载",
     "start": "一键启动",
     "stop": "停止",
     "logs": "实时日志",
@@ -236,8 +236,8 @@
   "frp": {
     "refresh": "刷新",
     "import": "导入本地",
-    "showAllArchFrpc": "所有架构 Frpc",
-    "showAllArchFrps": "所有架构 Frps",
+    "platformFilter": "架构",
+    "allPlatforms": "全部",
     "empty": "暂无 Frp 版本数据，点击刷新重试",
     "downloaded": "已下载",
     "local": "本地",
@@ -272,8 +272,8 @@
     "intro": "FrpcPilot 是一个基于 Tauri 2 + Vue 3 + TypeScript 打造的 frp 可视化客户端，帮你用图形界面管理 frpc 版本、服务器与隧道，从此告别手写 frpc.toml。",
     "flowTitle": "使用流程",
     "flow": {
-      "step1Title": "下载 frpc",
-      "step1Desc": "进入「Frpc 下载」，按平台与架构下载，或导入本地已有的 frpc。",
+      "step1Title": "下载 Frp",
+      "step1Desc": "进入「Frp下载」，按平台与架构下载，或导入本地已有的 frpc。",
       "step2Title": "配置服务器",
       "step2Desc": "在「服务器」中填写 frps 地址、端口与鉴权 Token，并启用其中一台。",
       "step3Title": "配置隧道",

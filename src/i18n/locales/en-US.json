@@ -25,7 +25,7 @@
     "dashboard": "Dashboard",
     "servers": "Servers",
     "tunnels": "Tunnels",
-    "download": "Download frpc",
+    "download": "Frp Download",
     "setting": "Settings"
   },
   "tray": {
@@ -62,7 +62,7 @@
     "arch": "Architecture",
     "ip": "IP address",
     "frpcVersion": "Frpc version",
-    "frpcVersionEmpty": "No downloaded version yet. Download one from the Frpc download page first.",
+    "frpcVersionEmpty": "No downloaded version yet. Download one from the Frp download page first.",
     "start": "One-click start",
     "stop": "Stop",
     "logs": "Live logs",
@@ -236,8 +236,8 @@
   "frp": {
     "refresh": "Refresh",
     "import": "Import local",
-    "showAllArchFrpc": "All-arch Frpc",
-    "showAllArchFrps": "All-arch Frps",
+    "platformFilter": "Platform",
+    "allPlatforms": "All",
     "empty": "No Frp release data. Click Refresh to retry.",
     "downloaded": "Downloaded",
     "local": "Local",
@@ -272,8 +272,8 @@
     "intro": "FrpcPilot is a visual client for frp built with Tauri 2 + Vue 3 + TypeScript. Manage frpc versions, servers and tunnels through a friendly GUI — and say goodbye to hand-writing frpc.toml.",
     "flowTitle": "How to use",
     "flow": {
-      "step1Title": "Download frpc",
-      "step1Desc": "Open \"Download frpc\", grab the build for your platform and architecture, or import a local one.",
+      "step1Title": "Download Frp",
+      "step1Desc": "Open \"Frp Download\", grab the build for your platform and architecture, or import a local one.",
       "step2Title": "Configure a server",
       "step2Desc": "Add the frps address, port and auth token under \"Servers\", then enable one of them.",
       "step3Title": "Configure tunnels",
