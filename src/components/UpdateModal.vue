@@ -27,25 +27,26 @@
       <p v-else class="m-0 opacity-80">{{ t("update.emptyLog") }}</p>
     </div>
 
-    <!-- 下载 / 安装进度 -->
-    <div v-if="store.installing" class="update-progress">
-      <a-progress :percent="store.progress" :stroke-color="'#6366f1'" />
-      <p class="m-0 text-xs opacity-60">{{ t("update.downloading") }}</p>
-    </div>
-
     <!-- 底部操作：忽略该版本 / 取消 / 确认更新 -->
     <template #footer>
       <div class="update-footer">
-        <a-button v-if="!store.installing" type="text" size="small" @click="onIgnore">
-          {{ t("update.ignore") }}
-        </a-button>
-        <div class="ml-auto flex items-center gap-2">
-          <a-button :disabled="store.installing" @click="onCancel">
-            {{ t("common.cancel") }}
+        <!-- 下载进度固定在 footer 的按钮操作上方 -->
+        <div v-if="store.installing" class="update-progress">
+          <a-progress :percent="store.progress" :stroke-color="'#6366f1'" />
+          <p class="m-0 text-xs opacity-60">{{ t("update.downloading") }}</p>
+        </div>
+        <div class="update-footer-actions">
+          <a-button v-if="!store.installing" type="text" size="small" @click="onIgnore">
+            {{ t("update.ignore") }}
           </a-button>
-          <a-button type="primary" :loading="store.installing" @click="onConfirm">
-            {{ t("update.confirm") }}
-          </a-button>
+          <div class="ml-auto flex items-center gap-2">
+            <a-button :disabled="store.installing" @click="onCancel">
+              {{ t("common.cancel") }}
+            </a-button>
+            <a-button type="primary" :loading="store.installing" @click="onConfirm">
+              {{ t("update.confirm") }}
+            </a-button>
+          </div>
         </div>
       </div>
     </template>
@@ -135,10 +136,16 @@ function onConfirm() {
 }
 
 .update-progress {
-  margin-top: 14px;
+  width: 100%;
 }
 
 .update-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.update-footer-actions {
   display: flex;
   align-items: center;
   gap: 8px;
