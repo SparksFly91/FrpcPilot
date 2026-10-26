@@ -71,6 +71,150 @@ Layout布局content区域的磨砂玻璃卡片圆角样式我要改动一下：
 - 设置页面里面也有一些没有随主题改变颜色
 - 整体全部检查并且修复一下
 
+#### 2.7 侧边栏折叠和漫游式引导
+
+- 侧边导航栏在设置下面增加一个折叠/展开的图标，点击用于控制侧边导航栏的折叠和展开
+  - 侧边导航栏折叠之后，需要注意折叠之后的图标居中显示，并且鼠标放上去之后的hover效果显示的时候，图标也要在hover效果里面居中
+  - 官方参考代码如下：
+
+```html
+<template>
+  <div style="width: 256px">
+    <a-button type="primary" style="margin-bottom: 16px" @click="toggleCollapsed">
+      <MenuUnfoldOutlined v-if="state.collapsed" />
+      <MenuFoldOutlined v-else />
+    </a-button>
+    <a-menu
+      v-model:openKeys="state.openKeys"
+      v-model:selectedKeys="state.selectedKeys"
+      mode="inline"
+      theme="dark"
+      :inline-collapsed="state.collapsed"
+      :items="items"
+    ></a-menu>
+  </div>
+</template>
+<script lang="ts" setup>
+import { reactive, watch, h } from 'vue';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  PieChartOutlined,
+  MailOutlined,
+  DesktopOutlined,
+  InboxOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons-vue';
+const state = reactive({
+  collapsed: false,
+  selectedKeys: ['1'],
+  openKeys: ['sub1'],
+  preOpenKeys: ['sub1'],
+});
+const items = reactive([
+  {
+    key: '1',
+    icon: () => h(PieChartOutlined),
+    label: 'Option 1',
+    title: 'Option 1',
+  },
+  {
+    key: '2',
+    icon: () => h(DesktopOutlined),
+    label: 'Option 2',
+    title: 'Option 2',
+  },
+  {
+    key: '3',
+    icon: () => h(InboxOutlined),
+    label: 'Option 3',
+    title: 'Option 3',
+  },
+  {
+    key: 'sub1',
+    icon: () => h(MailOutlined),
+    label: 'Navigation One',
+    title: 'Navigation One',
+    children: [
+      {
+        key: '5',
+        label: 'Option 5',
+        title: 'Option 5',
+      },
+      {
+        key: '6',
+        label: 'Option 6',
+        title: 'Option 6',
+      },
+      {
+        key: '7',
+        label: 'Option 7',
+        title: 'Option 7',
+      },
+      {
+        key: '8',
+        label: 'Option 8',
+        title: 'Option 8',
+      },
+    ],
+  },
+  {
+    key: 'sub2',
+    icon: () => h(AppstoreOutlined),
+    label: 'Navigation Two',
+    title: 'Navigation Two',
+    children: [
+      {
+        key: '9',
+        label: 'Option 9',
+        title: 'Option 9',
+      },
+      {
+        key: '10',
+        label: 'Option 10',
+        title: 'Option 10',
+      },
+      {
+        key: 'sub3',
+        label: 'Submenu',
+        title: 'Submenu',
+        children: [
+          {
+            key: '11',
+            label: 'Option 11',
+            title: 'Option 11',
+          },
+          {
+            key: '12',
+            label: 'Option 12',
+            title: 'Option 12',
+          },
+        ],
+      },
+    ],
+  },
+]);
+watch(
+  () => state.openKeys,
+  (_val, oldVal) => {
+    state.preOpenKeys = oldVal;
+  },
+);
+const toggleCollapsed = () => {
+  state.collapsed = !state.collapsed;
+  state.openKeys = state.collapsed ? [] : state.preOpenKeys;
+};
+</script>
+```
+
+- 第一次进入应用时，使用Antdv的漫游式引导组件做一个引导操作
+  - 漫游式引导的目的是帮助用户快速上手FrpcPilot的功能使用流程
+  - 配置服务器、创建隧道、下载Frp、仪表盘一键启动这是主要的四步流程，你可以按照这个来做引导
+- 打开应用时，当主界面未显示完整（还是白屏的时候），做一个启动加载动画，显示“FrpcPilot正在启动中”
+  - 加载动画可以是一圈正在转圈的圆点，圆点大小要有变化，颜色在加载的过程中也可以有变化，最好是做成svg动画的形式，或者你有更好的方案也可以采用
+
+开发过程中使用到的组件尽可能全部使用Antdv库里面的，另外我引入的有tailwindcss原子化组件、auto-import和components依赖可以简化引入，开发之前尽可能先阅读一下package.json，看一下有哪些依赖可以简化代码开发
+
 ### 3. 功能开发
 
 #### 3.1 开发服务器配置功能
@@ -189,3 +333,27 @@ Layout布局content区域的磨砂玻璃卡片圆角样式我要改动一下：
 - 其他与项目名称有关的也修改一下
 
 先扫描一下有哪些需要修改的，列一个清单出来，经过我的确认之后再开始修改
+
+#### 4.2 Frpc下载功能修改
+
+保持Frpc下载主要功能不变，现在需要对检索结果进行过滤方面的修改，具体如下：
+
+- 去掉当前的两个开关选项“所有架构frpc”和“所有架构frps”
+- 换成一个下拉列表，列表值为frp的所有不同架构分类，命名方式为：系统类型+下划线+架构，例如：windows_amd64、darwin_amd64、linux_amd64、linux_arm等等，默认值为当前运行环境操作系统类型和架构，最顶上有一个“全部”选项用来显示所有
+- 如果是选中“全部”，排列顺序为按照frp版本，从高到低显示同一个版本不同系统和架构的frp，再显示低版本的
+- 修改过程中保持主要的下载功能不变，包括加速方案
+- 左侧菜单栏改成Frp下载
+
+开发过程中使用到的组件尽可能全部使用Antdv库里面的，另外我引入的有tailwindcss原子化组件、auto-import和components依赖可以简化引入，开发之前尽可能先阅读一下package.json，看一下有哪些依赖可以简化代码开发
+
+#### 4.3 程序运行数据目录
+
+当前软件运行的数据在我这台电脑上都在：C:\Users\OrBit-0297\AppData\Roaming\FrpcPilot这个目录里面，我想要修改为数据保存在软件安装所在目录，例如我这台电脑安装在：D:\software\FrpcPilot，按照以下要求修改数据保存的目录：
+
+- 数据库文件、下载的frp全部保存在软件安装所在目录里面，并做好分类，例如：db数据库文件放在data目录里面，下载的frp放在frp目录里面，运行frpc生成的toml文件放在run目录里面
+- 程序运行时生成的其他文件等也放在软件安装目录下面
+- 我这样做的目的是假如安装位置不在C盘，就尽量减少C盘的占用，如果本身就安装在C盘的某个位置，上面说的那些文件保存路径也是以软件安装目录为准，避免放在默认目录里面
+- 顺便准备一份迁移脚本，在下一个版本升级的时候便于老版本用户无感迁移之前的数据，注意新安装用户不需要使用这个迁移脚本
+  - 我想到的方案是脚本，如果你有更好的方案的话，那就采用你的方案，如果没有，就按照我的要求来做，同时你需要考虑到我遗漏的地方
+  - 数据迁移之后，可能还需要处理数据库中保存的frp软件目录所在位置
+  - 迁移脚本需要考虑不同操作系统之间的差别

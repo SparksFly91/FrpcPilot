@@ -83,6 +83,7 @@
 
     <!-- 快速操作 -->
     <div
+      data-tour="dashboard-start"
       class="glass-panel glass-panel-flat flex shrink-0 flex-wrap items-center justify-between gap-3 px-5 py-3"
     >
       <div class="flex items-center gap-3">

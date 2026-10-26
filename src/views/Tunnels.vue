@@ -7,7 +7,7 @@
         <a-button :loading="loading" :icon="h(ReloadOutlined)" @click="refresh()">
           {{ t("tunnel.refresh") }}
         </a-button>
-        <a-button type="primary" :icon="h(PlusOutlined)" @click="openCreate">
+        <a-button data-tour="tunnel-create" type="primary" :icon="h(PlusOutlined)" @click="openCreate">
           {{ t("tunnel.add") }}
         </a-button>
       </a-space>

@@ -23,6 +23,7 @@
 
     <!-- 关闭确认对话框（最小化到系统托盘 / 直接退出） -->
     <CloseConfirmModal />
+    <OnboardingTour />
   </div>
 </template>
 
@@ -32,9 +33,12 @@ import Aside from "./aside/Aside.vue"
 import UpdateModal from "@/components/UpdateModal.vue"
 import CloseConfirmModal from "@/components/CloseConfirmModal.vue"
 import { useUpdateStore } from "@/stores/update"
+import { useOnboardingStore } from "@/stores/onboarding"
+import OnboardingTour from "@/components/OnboardingTour.vue"
 
 const router = useRouter()
 const updateStore = useUpdateStore()
+const onboarding = useOnboardingStore()
 
 /**
  * 需要 keep-alive 缓存的页面组件名列表（由路由 meta.isCache 决定）。
@@ -55,7 +59,12 @@ function goToSetting() {
 }
 
 // 应用启动后静默检查一次更新（已忽略的版本不会打扰用户）
-onMounted(() => {
-  updateStore.checkForUpdate(true)
-})
+const stopUpdateWatch = watch(
+  () => onboarding.ready && onboarding.dismissed && !onboarding.active,
+  (canCheck) => {
+    if (!canCheck) return
+    void updateStore.checkForUpdate(true)
+    stopUpdateWatch()
+  },
+)
 </script>

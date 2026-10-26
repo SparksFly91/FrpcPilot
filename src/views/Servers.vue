@@ -7,7 +7,7 @@
         <a-button :loading="loading" :icon="h(ReloadOutlined)" @click="refresh()">
           {{ t("server.refresh") }}
         </a-button>
-        <a-button type="primary" :icon="h(PlusOutlined)" @click="openCreate">
+        <a-button data-tour="server-create" type="primary" :icon="h(PlusOutlined)" @click="openCreate">
           {{ t("server.add") }}
         </a-button>
       </a-space>

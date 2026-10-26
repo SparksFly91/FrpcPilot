@@ -28,6 +28,24 @@
     "download": "Frp下载",
     "setting": "设置"
   },
+  "sidebar": {
+    "navigation": "主导航",
+    "collapse": "折叠导航",
+    "expand": "展开导航"
+  },
+  "onboarding": {
+    "title": "新手引导",
+    "replay": "重新查看",
+    "replayDescription": "用四个步骤了解从配置到启动的完整流程",
+    "serversTitle": "1 / 4 · 配置服务器",
+    "serversDescription": "从「新增服务器」开始，填写已部署的 frps 地址、端口和鉴权 Token，并启用这台服务器。同一时间只需启用一台。",
+    "tunnelsTitle": "2 / 4 · 创建隧道",
+    "tunnelsDescription": "点击「新增隧道」，选择 TCP、HTTP 等代理类型，填写本地服务的 IP 和端口，以及远程端口或域名，保存并启用隧道。可以同时启用多个隧道。",
+    "downloadTitle": "3 / 4 · 下载 Frp",
+    "downloadDescription": "按当前系统和架构筛选版本，在下方版本卡片中下载 Frp；也可以通过「导入本地」使用已有的 frpc。下载或导入后，即可在仪表盘中选择该版本。",
+    "dashboardTitle": "4 / 4 · 仪表盘一键启动",
+    "dashboardDescription": "完成前面的配置后，选择已下载的 Frpc 版本，点击「一键启动」开始穿透。下方实时日志和运行状态可帮助确认连接情况。现在可以开始配置了，也可随时在「设置 → 常规」重新查看引导。"
+  },
   "tray": {
     "show": "显示窗口",
     "start": "启动穿透",

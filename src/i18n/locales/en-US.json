@@ -28,6 +28,24 @@
     "download": "Frp Download",
     "setting": "Settings"
   },
+  "sidebar": {
+    "navigation": "Main navigation",
+    "collapse": "Collapse navigation",
+    "expand": "Expand navigation"
+  },
+  "onboarding": {
+    "title": "Getting started",
+    "replay": "View guide",
+    "replayDescription": "Learn the complete setup and startup workflow in four steps",
+    "serversTitle": "1 / 4 · Configure a server",
+    "serversDescription": "Choose Add Server, enter your deployed frps address, port and authentication token, then enable the server. Only one server needs to be enabled at a time.",
+    "tunnelsTitle": "2 / 4 · Create a tunnel",
+    "tunnelsDescription": "Choose Add Tunnel, select a proxy type such as TCP or HTTP, and enter your local service IP and port, plus a remote port or domain. Save and enable the tunnel. Multiple tunnels can run together.",
+    "downloadTitle": "3 / 4 · Download Frp",
+    "downloadDescription": "Filter by your system and architecture, then download Frp from a version card below. You can also import an existing local frpc. Downloaded or imported versions appear in the dashboard selector.",
+    "dashboardTitle": "4 / 4 · Start from the dashboard",
+    "dashboardDescription": "After setup, select a downloaded Frpc version and click Start to connect. Check the live logs and running status below to verify the connection. You are ready to configure your connection. Replay this guide anytime in Settings → General."
+  },
   "tray": {
     "show": "Show window",
     "start": "Start tunnel",

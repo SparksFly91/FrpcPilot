@@ -1,14 +1,19 @@
 <template>
   <!-- 侧边栏：磨砂玻璃悬浮面板 -->
-  <aside class="glass-panel flex w-56 shrink-0 flex-col overflow-hidden">
+  <aside
+    id="app-sidebar"
+    class="app-sidebar glass-panel flex shrink-0 flex-col overflow-hidden"
+    :class="{ 'is-collapsed': appStore.sidebarCollapsed }"
+    :aria-label="t('sidebar.navigation')"
+  >
     <!-- 菜单区 -->
     <div class="flex-1 overflow-y-auto p-2">
-      <a-menu class="aside-menu" mode="inline" :selected-keys="selectedKeys" :items="menuItems" @click="onMenuClick" />
+      <a-menu class="aside-menu" mode="inline" :inline-collapsed="appStore.sidebarCollapsed" :selected-keys="selectedKeys" :items="menuItems" @click="onMenuClick" />
     </div>
 
     <!-- 底部系统信息区（与菜单之间有间隔） -->
     <div class="system-panel mt-2 border-t px-2 pb-2 pt-3">
-      <div class="px-1">
+      <div v-if="!appStore.sidebarCollapsed" class="px-1">
         <!-- CPU -->
         <div class="mb-2">
           <div class="mb-1 flex items-center justify-between text-xs">
@@ -35,15 +40,38 @@
         </div>
       </div>
 
+      <a-tooltip v-else placement="right" :title="`${t('system.cpu')}: ${cpu}% · ${t('system.memory')}: ${memory}% · ${statusText}`">
+        <div class="flex h-10 items-center justify-center" tabindex="0" :aria-label="`${t('system.cpu')}: ${cpu}% · ${t('system.memory')}: ${memory}% · ${statusText}`">
+          <span class="h-2 w-2 rounded-full" :class="statusDotClass" />
+        </div>
+      </a-tooltip>
+
       <!-- 设置入口（位于运行状态下方） -->
       <div class="system-divider mt-3 border-t pt-2">
         <a-menu
           class="aside-menu"
           mode="inline"
+          :inline-collapsed="appStore.sidebarCollapsed"
           :selected-keys="settingSelectedKeys"
           :items="settingItems"
           @click="onMenuClick"
         />
+        <a-tooltip placement="right" :title="collapseLabel">
+          <a-button
+            class="sidebar-toggle"
+            type="text"
+            :aria-label="collapseLabel"
+            :aria-expanded="!appStore.sidebarCollapsed"
+            aria-controls="app-sidebar"
+            @click="appStore.sidebarCollapsed = !appStore.sidebarCollapsed"
+          >
+            <template #icon>
+              <MenuUnfoldOutlined v-if="appStore.sidebarCollapsed" />
+              <MenuFoldOutlined v-else />
+            </template>
+            <span v-if="!appStore.sidebarCollapsed">{{ collapseLabel }}</span>
+          </a-button>
+        </a-tooltip>
       </div>
     </div>
   </aside>
@@ -56,6 +84,8 @@ import {
   CloudServerOutlined,
   DashboardOutlined,
   DownloadOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   SettingOutlined,
 } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
@@ -67,6 +97,7 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
+const collapseLabel = computed(() => t(appStore.sidebarCollapsed ? 'sidebar.expand' : 'sidebar.collapse'))
 
 const { cpu, memory } = useSystemStats()
 
@@ -121,6 +152,60 @@ const statusText = computed(() => {
 </script>
 
 <style scoped lang="scss">
+.app-sidebar {
+  width: 224px;
+  transition: width 200ms ease;
+
+  &.is-collapsed {
+    width: 72px;
+  }
+}
+
+.sidebar-toggle {
+  width: 100%;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.sidebar-toggle:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: -2px;
+}
+
+.is-collapsed .aside-menu {
+  width: 100%;
+  border-inline-end: none;
+
+  :deep(.ant-menu-item) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 0 !important;
+    height: 44px;
+    line-height: 44px;
+  }
+
+  :deep(.ant-menu-item-icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 16px;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  :deep(.ant-menu-title-content) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar {
+    transition: none;
+  }
+}
+
 .system-panel {
   border-color: rgba(15, 23, 42, 0.08);
 }

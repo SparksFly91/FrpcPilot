@@ -3,6 +3,31 @@
     <h2 class="mb-1 text-lg font-semibold">{{ t("settings.general.title") }}</h2>
     <p class="mb-5 text-xs opacity-60">{{ t("settings.general.subtitle") }}</p>
 
+    <!-- 重新开始引导：与引导弹窗一致，可在此再次触发 -->
+    <section class="flex items-center justify-between gap-4">
+      <div>
+        <div class="text-sm font-medium">{{ t('onboarding.title') }}</div>
+        <p class="mt-1 text-xs opacity-60">{{ t('onboarding.replayDescription') }}</p>
+      </div>
+      <a-button class="shrink-0" @click="onboarding.start">{{ t('onboarding.replay') }}</a-button>
+    </section>
+
+    <a-divider class="general-divider" />
+
+    <!-- 语言：与顶部栏语言切换共用同一状态 -->
+    <section>
+      <div class="mb-1 text-sm font-medium">{{ t("settings.general.language") }}</div>
+      <p class="mb-2 text-xs opacity-60">{{ t("settings.general.languageTip") }}</p>
+      <a-radio-group
+        v-model:value="appStore.language"
+        :options="languageRadios"
+        option-type="button"
+        button-style="solid"
+      />
+    </section>
+    
+    <a-divider class="general-divider" />
+
     <!-- 开机自启：开关直接写入系统启动项，状态由系统决定 -->
     <section>
       <div class="flex items-center justify-between gap-4">
@@ -34,19 +59,6 @@
       <CardRadioGroup v-model="windowStore.closeChoice" :options="choiceOptions" />
     </section>
 
-    <a-divider class="general-divider" />
-
-    <!-- 语言：与顶部栏语言切换共用同一状态 -->
-    <section>
-      <div class="mb-1 text-sm font-medium">{{ t("settings.general.language") }}</div>
-      <p class="mb-2 text-xs opacity-60">{{ t("settings.general.languageTip") }}</p>
-      <a-radio-group
-        v-model:value="appStore.language"
-        :options="languageRadios"
-        option-type="button"
-        button-style="solid"
-      />
-    </section>
   </div>
 </template>
 
@@ -56,11 +68,13 @@ import { languageOptions } from "@/i18n"
 import { useAppStore } from "@/stores/app"
 import { useAutostartStore } from "@/stores/autostart"
 import { useWindowStore } from "@/stores/window"
+import { useOnboardingStore } from "@/stores/onboarding"
 
 const { t } = useI18n()
 const appStore = useAppStore()
 const autostartStore = useAutostartStore()
 const windowStore = useWindowStore()
+const onboarding = useOnboardingStore()
 
 const behaviorOptions = computed(() => [
   { value: "ask" as const, label: t("closeDialog.ask"), description: t("closeDialog.askDesc") },

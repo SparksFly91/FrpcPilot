@@ -18,6 +18,8 @@ export const useAppStore = defineStore("app", () => {
   // 语言（持久化到 localStorage）
   const language = useStorage<Language>("frpcpilot:language", "zh-CN")
 
+  const sidebarCollapsed = useStorage("frpcpilot:sidebar-collapsed", false)
+
   // 明暗主题：useDark 会在 <html> 上切换 .dark 类名
   const isDark = useDark({
     storageKey: "frpcpilot:theme",
@@ -93,6 +95,7 @@ export const useAppStore = defineStore("app", () => {
 
   return {
     language,
+    sidebarCollapsed,
     isDark,
     toggleDark,
     background,

@@ -1,13 +1,86 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FrpcPilot</title>
+    <!-- 首屏样式内联，脚本和样式资源尚未加载时也能显示启动状态。 -->
+    <style>
+      #startup-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        background: radial-gradient(ellipse at 50% 40%, #e0e7ff, #f8fafc 70%);
+        color: #334155;
+        font: 500 15px/1.6 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      }
+      #startup-loader[data-theme="dark"] {
+        background: radial-gradient(ellipse at 50% 40%, #1e1b4b, #0f172a 70%);
+        color: #e2e8f0;
+      }
+      #startup-loader svg { width: 76px; height: 76px; overflow: visible; }
+      #startup-loader .startup-ring {
+        transform-origin: 40px 40px;
+        animation: startup-orbit 3.6s linear infinite;
+      }
+      #startup-loader circle {
+        fill: #6366f1;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: startup-dot 1.6s ease-in-out infinite;
+        animation-delay: var(--delay);
+      }
+      @keyframes startup-orbit { to { transform: rotate(360deg); } }
+      @keyframes startup-dot {
+        0%, 100% { transform: scale(.55); opacity: .35; fill: #6366f1; }
+        50% { transform: scale(1.1); opacity: 1; fill: #06b6d4; }
+      }
+      @media (prefers-color-scheme: dark) {
+        #startup-loader:not([data-theme="light"]) {
+          background: radial-gradient(ellipse at 50% 40%, #1e1b4b, #0f172a 70%);
+          color: #e2e8f0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #startup-loader .startup-ring, #startup-loader circle { animation: none; }
+      }
+    </style>
   </head>
 
   <body>
+    <div id="startup-loader" role="status" aria-live="polite" aria-busy="true" data-tauri-drag-region>
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <g class="startup-ring">
+          <circle cx="40" cy="12" r="5" style="--delay: -1.4s" />
+          <circle cx="60" cy="20" r="5" style="--delay: -1.2s" />
+          <circle cx="68" cy="40" r="5" style="--delay: -1s" />
+          <circle cx="60" cy="60" r="5" style="--delay: -.8s" />
+          <circle cx="40" cy="68" r="5" style="--delay: -.6s" />
+          <circle cx="20" cy="60" r="5" style="--delay: -.4s" />
+          <circle cx="12" cy="40" r="5" style="--delay: -.2s" />
+          <circle cx="20" cy="20" r="5" style="--delay: 0s" />
+        </g>
+      </svg>
+      <span id="startup-label">FrpcPilot正在启动中</span>
+    </div>
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('frpcpilot:theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          document.getElementById('startup-loader').dataset.theme = savedTheme;
+        }
+        if (localStorage.getItem('frpcpilot:language') === 'en-US') {
+          document.getElementById('startup-label').textContent = 'FrpcPilot is starting';
+          document.documentElement.lang = 'en';
+        }
+      } catch { /* 存储不可用时仍显示默认启动画面。 */ }
+    </script>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

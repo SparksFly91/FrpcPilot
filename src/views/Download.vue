@@ -2,6 +2,7 @@
   <div class="flex h-full flex-col gap-3">
     <!-- 顶部操作栏（独立磨砂卡片） -->
     <div
+      data-tour="frp-download"
       class="glass-panel glass-panel-flat flex shrink-0 flex-wrap items-center justify-between gap-3 px-5 py-3"
     >
       <div class="flex items-center gap-2">
