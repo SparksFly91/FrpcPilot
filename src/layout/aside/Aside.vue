@@ -164,7 +164,25 @@ const statusText = computed(() => {
 .sidebar-toggle {
   width: 100%;
   height: 44px;
+  border: 0;
   border-radius: 10px;
+}
+
+/* 展开时沿用菜单项的左内边距，让折叠操作与“设置”入口排成同一列。 */
+.app-sidebar:not(.is-collapsed) .sidebar-toggle {
+  justify-content: flex-start;
+  gap: 10px;
+  padding-inline: 24px;
+
+  :deep(.anticon + span) {
+    margin-inline-start: 0;
+  }
+}
+
+/* 折叠时隐藏文字后，按钮和菜单图标都回到侧栏中心。 */
+.app-sidebar.is-collapsed .sidebar-toggle {
+  justify-content: center;
+  padding-inline: 0;
 }
 
 .sidebar-toggle:focus-visible {
