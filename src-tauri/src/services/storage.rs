@@ -45,6 +45,9 @@ impl StoragePaths {
     pub fn run(&self) -> PathBuf {
         self.root.join("run")
     }
+    pub fn logs(&self) -> PathBuf {
+        self.root.join("logs")
+    }
     pub fn webview(&self) -> PathBuf {
         self.root.join("webview")
     }
@@ -125,7 +128,7 @@ pub async fn initialize(paths: &StoragePaths) -> Result<(SqlitePool, StorageLock
         paths.run(),
         paths.webview(),
         paths.root.join("cache"),
-        paths.root.join("logs"),
+        paths.logs(),
         paths.root.join("tmp"),
     ] {
         fs::create_dir_all(&dir).map_err(|e| format!("无法创建 {}：{e}", dir.display()))?;

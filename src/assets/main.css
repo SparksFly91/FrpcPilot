@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* 使用 class 方式控制暗色模式（配合 @vueuse/core 的 useDark） */
+/* 使用 class 方式控制暗色模式 */
 @custom-variant dark (&:where(.dark, .dark *));
 
 html,
@@ -11,7 +11,7 @@ body,
   padding: 0;
 }
 
-/* 窗口背景色与渐变（供 html / #app 复用，避免重复定义） */
+/* 窗口纯色背景与磨砂透明度 */
 :root {
   /* 全局文字颜色：普通 HTML 文本继承使用（Antd 组件由 CSS-in-JS 自行着色，不受影响） */
   --app-text-color: rgba(15, 23, 42, 0.88);
@@ -19,20 +19,13 @@ body,
   --app-card-alpha: 0.45;
   --app-card-alpha-hover: 0.62;
   --app-modal-alpha: 0.62;
-  --app-bg-color: #eef2ff;
-  --app-bg-gradient:
-    radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.28), transparent 60%),
-    radial-gradient(1000px 500px at 110% 10%, rgba(34, 211, 238, 0.28), transparent 55%),
-    linear-gradient(160deg, #eef2ff 0%, #f8fafc 45%, #eef7ff 100%);
+  --app-background-overlay-alpha: 0.18;
+  --app-bg-color: #e9edef;
 }
 
 html.dark {
   --app-text-color: rgba(226, 232, 240, 0.92);
-  --app-bg-color: #0b1220;
-  --app-bg-gradient:
-    radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.35), transparent 60%),
-    radial-gradient(1000px 500px at 110% 10%, rgba(14, 165, 233, 0.28), transparent 55%),
-    linear-gradient(160deg, #0b1220 0%, #0f172a 45%, #111827 100%);
+  --app-bg-color: #151c1d;
 }
 
 /*
@@ -43,7 +36,6 @@ html.dark {
  */
 html {
   background-color: var(--app-bg-color);
-  background-image: var(--app-bg-gradient);
   background-repeat: no-repeat;
 }
 
@@ -71,8 +63,9 @@ html.is-macos #app {
   inset: 0;
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
+  isolation: isolate;
   background-color: var(--app-bg-color);
-  background-image: var(--app-bg-gradient);
   background-repeat: no-repeat;
 }
 
@@ -113,8 +106,28 @@ body {
 
 /* 窗口圆角固定 8px，与 Windows 11 系统默认圆角保持一致 */
 #app {
+  position: relative;
+  isolation: isolate;
   border-radius: 8px;
   overflow: hidden;
+}
+
+#app::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  background: rgba(255, 255, 255, var(--app-background-overlay-alpha));
+  content: "";
+  pointer-events: none;
+}
+
+.dark #app::before {
+  background: rgba(0, 0, 0, var(--app-background-overlay-alpha));
+}
+
+#app > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* 悬浮磨砂玻璃面板 */

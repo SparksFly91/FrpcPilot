@@ -5,6 +5,7 @@
 
 use std::path::PathBuf;
 
+use chrono::Local;
 use sqlx::SqlitePool;
 use tauri::{AppHandle, Manager, State};
 use tauri_helper::auto_collect_command;
@@ -152,7 +153,17 @@ pub async fn start_frpc(
 
     // 5. 启动 frpc 进程
     let config_path_str = config_path.to_string_lossy().to_string();
-    match runner.spawn(&app, &frpc_path, &config_path_str, &download.version) {
+    let paths = app.state::<StoragePaths>();
+    let log_path = paths
+        .logs()
+        .join(format!("frpc-{}.log", Local::now().format("%Y-%m-%d")));
+    match runner.spawn(
+        &app,
+        &frpc_path,
+        &config_path_str,
+        &download.version,
+        &log_path,
+    ) {
         Ok(status) => Ok(ApiResponse::success(status)),
         Err(e) => Ok(ApiResponse::error(500, &e)),
     }

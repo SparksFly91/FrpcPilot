@@ -6,7 +6,8 @@
 //! - stdout / stderr 通过管道读取，按行解析后以 `frpc-log` 事件实时推送给前端；
 //! - 后台守护线程轮询子进程状态，退出时推送 `frpc-exit` 事件。
 
-use std::io::{BufRead, BufReader, Read};
+use std::fs::{File, OpenOptions};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::Path;
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -14,6 +15,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread;
 use std::time::Duration;
 
+use chrono::Local;
 use tauri::{AppHandle, Emitter};
 
 use crate::models::{FrpcExitEvent, FrpcLogEvent, FrpcStatus};
@@ -22,6 +24,8 @@ use crate::models::{FrpcExitEvent, FrpcLogEvent, FrpcStatus};
 pub const LOG_EVENT: &str = "frpc-log";
 /// 进程退出事件名
 pub const EXIT_EVENT: &str = "frpc-exit";
+
+type SharedLogFile = Arc<Mutex<File>>;
 
 /// 守护线程轮询间隔
 const POLL_INTERVAL: Duration = Duration::from_millis(250);
@@ -34,6 +38,7 @@ struct Running {
     version: String,
     frpc_path: String,
     config_path: String,
+    log_file: SharedLogFile,
 }
 
 /// Frpc 进程管理器（应用级单例）
@@ -78,6 +83,7 @@ impl FrpcRunner {
         frpc_path: &str,
         config_path: &str,
         version: &str,
+        log_path: &Path,
     ) -> Result<FrpcStatus, String> {
         let mut guard = self.lock();
         if guard.is_some() {
@@ -88,6 +94,14 @@ impl FrpcRunner {
         if !exe.is_file() {
             return Err(format!("未找到 frpc 可执行文件：{frpc_path}"));
         }
+
+        let log_file = Arc::new(Mutex::new(
+            OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(log_path)
+                .map_err(|e| format!("无法打开运行日志 {}：{e}", log_path.display()))?,
+        ));
 
         let mut command = Command::new(exe);
         command
@@ -126,21 +140,22 @@ impl FrpcRunner {
             version: version.to_string(),
             frpc_path: frpc_path.to_string(),
             config_path: config_path.to_string(),
+            log_file: log_file.clone(),
         });
         drop(guard);
 
         // 采集 stdout / stderr
         if let Some(stdout) = stdout {
-            spawn_reader(app.clone(), stdout, "stdout");
+            spawn_reader(app.clone(), stdout, "stdout", log_file.clone());
         }
         if let Some(stderr) = stderr {
-            spawn_reader(app.clone(), stderr, "stderr");
+            spawn_reader(app.clone(), stderr, "stderr", log_file.clone());
         }
 
         // 守护线程：轮询子进程是否退出
         spawn_waiter(app.clone(), self.slot.clone(), token);
 
-        emit_log(
+        emit_persisted_log(
             app,
             FrpcLogEvent {
                 time: None,
@@ -148,6 +163,7 @@ impl FrpcRunner {
                 source: "system".to_string(),
                 message: format!("Frpc {version} 已启动（PID {pid}）"),
             },
+            Some(&log_file),
         );
 
         Ok(self.status())
@@ -160,7 +176,9 @@ impl FrpcRunner {
             return Ok(FrpcStatus::default());
         }
 
-        emit_log(
+        let log_file = guard.as_ref().map(|running| running.log_file.clone());
+
+        emit_persisted_log(
             app,
             FrpcLogEvent {
                 time: None,
@@ -168,6 +186,7 @@ impl FrpcRunner {
                 source: "system".to_string(),
                 message: "正在停止 Frpc…".to_string(),
             },
+            log_file.as_ref(),
         );
 
         let version = {
@@ -181,7 +200,7 @@ impl FrpcRunner {
         *guard = None;
         drop(guard);
 
-        emit_log(
+        emit_persisted_log(
             app,
             FrpcLogEvent {
                 time: None,
@@ -189,6 +208,7 @@ impl FrpcRunner {
                 source: "system".to_string(),
                 message: "Frpc 已停止".to_string(),
             },
+            log_file.as_ref(),
         );
         emit_exit(
             app,
@@ -208,13 +228,27 @@ impl FrpcRunner {
         if let Some(running) = guard.as_mut() {
             let _ = running.child.kill();
             let _ = running.child.wait();
+            persist_log(
+                &running.log_file,
+                &FrpcLogEvent {
+                    time: None,
+                    level: "WARN".to_string(),
+                    source: "system".to_string(),
+                    message: "FrpcPilot 正在退出，Frpc 已停止".to_string(),
+                },
+            );
         }
         *guard = None;
     }
 }
 
 /// 持续读取子进程输出并推送日志事件
-fn spawn_reader<R: Read + Send + 'static>(app: AppHandle, pipe: R, source: &'static str) {
+fn spawn_reader<R: Read + Send + 'static>(
+    app: AppHandle,
+    pipe: R,
+    source: &'static str,
+    log_file: SharedLogFile,
+) {
     thread::spawn(move || {
         let mut reader = BufReader::new(pipe);
         let mut buf: Vec<u8> = Vec::new();
@@ -228,7 +262,7 @@ fn spawn_reader<R: Read + Send + 'static>(app: AppHandle, pipe: R, source: &'sta
                     if line.trim().is_empty() {
                         continue;
                     }
-                    emit_log(&app, parse_line(source, &line));
+                    emit_persisted_log(&app, parse_line(source, &line), Some(&log_file));
                 }
                 Err(_) => break,
             }
@@ -238,48 +272,58 @@ fn spawn_reader<R: Read + Send + 'static>(app: AppHandle, pipe: R, source: &'sta
 
 /// 守护线程：轮询子进程状态，退出时清理并推送事件
 fn spawn_waiter(app: AppHandle, slot: Arc<Mutex<Option<Running>>>, token: u64) {
-    thread::spawn(move || loop {
-        thread::sleep(POLL_INTERVAL);
+    thread::spawn(move || {
+        loop {
+            thread::sleep(POLL_INTERVAL);
 
-        let mut guard = slot.lock().unwrap_or_else(|e| e.into_inner());
-        let probe = match guard.as_mut() {
-            Some(running) if running.token == token => {
-                Some((running.child.try_wait(), running.version.clone()))
-            }
-            // 已被停止 / 已被新进程替换
-            _ => None,
-        };
+            let mut guard = slot.lock().unwrap_or_else(|e| e.into_inner());
+            let probe = match guard.as_mut() {
+                Some(running) if running.token == token => Some((
+                    running.child.try_wait(),
+                    running.version.clone(),
+                    running.log_file.clone(),
+                )),
+                // 已被停止 / 已被新进程替换
+                _ => None,
+            };
 
-        match probe {
-            None => return,
-            Some((Ok(Some(status)), version)) => {
-                *guard = None;
-                drop(guard);
-                let code = status.code();
-                emit_log(
-                    &app,
-                    FrpcLogEvent {
-                        time: None,
-                        level: if code.unwrap_or(1) == 0 { "WARN" } else { "ERROR" }.to_string(),
-                        source: "system".to_string(),
-                        message: match code {
-                            Some(code) => format!("Frpc 进程已退出（退出码 {code}）"),
-                            None => "Frpc 进程已退出".to_string(),
+            match probe {
+                None => return,
+                Some((Ok(Some(status)), version, log_file)) => {
+                    *guard = None;
+                    drop(guard);
+                    let code = status.code();
+                    emit_persisted_log(
+                        &app,
+                        FrpcLogEvent {
+                            time: None,
+                            level: if code.unwrap_or(1) == 0 {
+                                "WARN"
+                            } else {
+                                "ERROR"
+                            }
+                            .to_string(),
+                            source: "system".to_string(),
+                            message: match code {
+                                Some(code) => format!("Frpc 进程已退出（退出码 {code}）"),
+                                None => "Frpc 进程已退出".to_string(),
+                            },
                         },
-                    },
-                );
-                emit_exit(
-                    &app,
-                    FrpcExitEvent {
-                        reason: "exited".to_string(),
-                        code,
-                        version: Some(version),
-                    },
-                );
-                return;
+                        Some(&log_file),
+                    );
+                    emit_exit(
+                        &app,
+                        FrpcExitEvent {
+                            reason: "exited".to_string(),
+                            code,
+                            version: Some(version),
+                        },
+                    );
+                    return;
+                }
+                Some((Ok(None), _, _)) => {} // 仍在运行
+                Some((Err(_), _, _)) => return,
             }
-            Some((Ok(None), _)) => {} // 仍在运行
-            Some((Err(_), _)) => return,
         }
     });
 }
@@ -393,6 +437,27 @@ fn emit_log(app: &AppHandle, event: FrpcLogEvent) {
     let _ = app.emit(LOG_EVENT, event);
 }
 
+fn emit_persisted_log(app: &AppHandle, event: FrpcLogEvent, log_file: Option<&SharedLogFile>) {
+    if let Some(log_file) = log_file {
+        persist_log(log_file, &event);
+    }
+    emit_log(app, event);
+}
+
+fn persist_log(log_file: &SharedLogFile, event: &FrpcLogEvent) {
+    let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S");
+    let mut file = log_file.lock().unwrap_or_else(|error| error.into_inner());
+    if let Err(error) = writeln!(
+        file,
+        "{timestamp} [{}] [{}] {}",
+        event.level, event.source, event.message
+    )
+    .and_then(|()| file.flush())
+    {
+        eprintln!("Failed to persist Frpc runtime log: {error}");
+    }
+}
+
 /// 发送退出事件
 fn emit_exit(app: &AppHandle, event: FrpcExitEvent) {
     let _ = app.emit(EXIT_EVENT, event);
@@ -404,8 +469,14 @@ mod tests {
 
     #[test]
     fn detects_log_level() {
-        assert_eq!(detect_level("2026/06/18 22:02:03 [I] [root.go:200] ok"), "INFO");
-        assert_eq!(detect_level("2026/06/18 22:02:03 [E] [root.go:200] bad"), "ERROR");
+        assert_eq!(
+            detect_level("2026/06/18 22:02:03 [I] [root.go:200] ok"),
+            "INFO"
+        );
+        assert_eq!(
+            detect_level("2026/06/18 22:02:03 [E] [root.go:200] bad"),
+            "ERROR"
+        );
         assert_eq!(detect_level("[W] warn only"), "WARN");
         assert_eq!(detect_level("plain message"), "INFO");
     }
@@ -417,6 +488,46 @@ mod tests {
             Some("22:02:03".to_string())
         );
         assert_eq!(extract_time("no time here"), None);
+    }
+
+    #[test]
+    fn persists_runtime_log_lines() {
+        let path = std::env::temp_dir().join(format!(
+            "frpcpilot-runtime-log-{}-{}.log",
+            std::process::id(),
+            Local::now().timestamp_millis()
+        ));
+        let file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&path)
+            .unwrap();
+        let log_file = Arc::new(Mutex::new(file));
+
+        persist_log(
+            &log_file,
+            &FrpcLogEvent {
+                time: None,
+                level: "INFO".to_string(),
+                source: "system".to_string(),
+                message: "started".to_string(),
+            },
+        );
+        persist_log(
+            &log_file,
+            &FrpcLogEvent {
+                time: None,
+                level: "ERROR".to_string(),
+                source: "stderr".to_string(),
+                message: "connection failed".to_string(),
+            },
+        );
+        drop(log_file);
+
+        let contents = std::fs::read_to_string(&path).unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert!(contents.contains("[INFO] [system] started"));
+        assert!(contents.contains("[ERROR] [stderr] connection failed"));
     }
 
     #[test]

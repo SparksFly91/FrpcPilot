@@ -40,11 +40,27 @@
         </div>
       </div>
 
-      <a-tooltip v-else placement="right" :title="`${t('system.cpu')}: ${cpu}% · ${t('system.memory')}: ${memory}% · ${statusText}`">
-        <div class="flex h-10 items-center justify-center" tabindex="0" :aria-label="`${t('system.cpu')}: ${cpu}% · ${t('system.memory')}: ${memory}% · ${statusText}`">
-          <span class="h-2 w-2 rounded-full" :class="statusDotClass" />
+      <div
+        v-else
+        class="collapsed-system-stats"
+        tabindex="0"
+        :aria-label="`${t('system.cpu')}: ${cpu}% · ${t('system.memory')}: ${memory}% · ${statusText}`"
+      >
+        <div class="collapsed-system-metric">
+          <span class="collapsed-system-label">CPU</span>
+          <span class="collapsed-system-value">{{ cpu }}%</span>
+          <span class="collapsed-system-track"><span :style="{ width: `${cpu}%`, backgroundColor: barColor(cpu) }" /></span>
         </div>
-      </a-tooltip>
+        <div class="collapsed-system-metric">
+          <span class="collapsed-system-label">MEM</span>
+          <span class="collapsed-system-value">{{ memory }}%</span>
+          <span class="collapsed-system-track"><span :style="{ width: `${memory}%`, backgroundColor: barColor(memory) }" /></span>
+        </div>
+        <div class="collapsed-system-status">
+          <span class="h-2 w-2 shrink-0 rounded-full" :class="statusDotClass" />
+          <span>{{ statusText }}</span>
+        </div>
+      </div>
 
       <!-- 设置入口（位于运行状态下方） -->
       <div class="system-divider mt-3 border-t pt-2">
@@ -226,6 +242,60 @@ const statusText = computed(() => {
 
 .system-panel {
   border-color: rgba(15, 23, 42, 0.08);
+}
+
+.collapsed-system-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0 4px;
+  outline: none;
+}
+
+.collapsed-system-metric {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.collapsed-system-label {
+  font-size: 9px;
+  opacity: 0.62;
+}
+
+.collapsed-system-value {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.collapsed-system-track {
+  width: 38px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.2);
+
+  > span {
+    display: block;
+    height: 100%;
+    transition: width 200ms ease;
+  }
+}
+
+.collapsed-system-status {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 9px;
+  line-height: 1.2;
+  opacity: 0.8;
 }
 
 .dark .system-panel {

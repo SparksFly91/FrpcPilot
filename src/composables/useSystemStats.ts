@@ -1,5 +1,6 @@
 import { getSystemInfo } from "@/api/system"
 import { isTauri } from "@/utils/window"
+import { createSharedComposable } from "@vueuse/core"
 
 /**
  * 系统资源占用（CPU / 内存 百分比）。
@@ -7,7 +8,7 @@ import { isTauri } from "@/utils/window"
  * 调用后端命令 `get_system_info`（返回 `ApiResponse<{ cpu, memory }>`），
  * 在非 Tauri 环境或后端不可用时回退到模拟数据，保证界面可用。
  */
-export function useSystemStats(interval = 2000) {
+const useSharedSystemStats = createSharedComposable((interval: number) => {
   const cpu = ref(0)
   const memory = ref(0)
   const isMock = ref(true)
@@ -41,4 +42,9 @@ export function useSystemStats(interval = 2000) {
   const { pause, resume } = useIntervalFn(refresh, interval, { immediate: true })
 
   return { cpu, memory, isMock, refresh, pause, resume }
+})
+
+/** 所有页面共享同一份指标缓存与轮询，路由切换时不会重新请求。 */
+export function useSystemStats(interval = 2000) {
+  return useSharedSystemStats(interval)
 }

@@ -64,6 +64,7 @@ fn fresh_install_and_exclusive_storage_lock() {
         let (pool, lock) = initialize(&paths).await.unwrap();
         assert!(paths.db().is_file());
         assert!(paths.run().is_dir());
+        assert!(paths.logs().is_dir());
         assert!(paths.versions().is_dir());
         assert!(initialize(&paths).await.is_err());
         pool.close().await;

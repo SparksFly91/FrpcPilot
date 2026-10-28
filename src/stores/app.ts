@@ -11,6 +11,7 @@ import {
 
 /** Frpc 运行状态 */
 export type RunStatus = "running" | "error" | "stopped"
+export type ThemeMode = "light" | "dark" | "system"
 
 /**
  * 全局应用配置：语言、主题、窗口背景、Frpc 运行状态
@@ -21,16 +22,27 @@ export const useAppStore = defineStore("app", () => {
 
   const sidebarCollapsed = useStorage("frpcpilot:sidebar-collapsed", false, preferences)
 
-  // 明暗主题：useDark 会在 <html> 上切换 .dark 类名
-  const isDark = useDark({
-    storage: preferences,
-    storageKey: "frpcpilot:theme",
-    selector: "html",
-    attribute: "class",
-    valueDark: "dark",
-    valueLight: "",
+  // 兼容旧版保存的 "dark" / 空浅色值，并支持跟随操作系统主题。
+  const themePreference = useStorage<ThemeMode | "">("frpcpilot:theme", "system", preferences)
+  const preferredDark = usePreferredDark()
+  const themeMode = computed<ThemeMode>({
+    get: () => {
+      if (themePreference.value === "dark" || themePreference.value === "system") return themePreference.value
+      return "light"
+    },
+    set: (value) => { themePreference.value = value },
   })
-  const toggleDark = useToggle(isDark)
+  const isDark = computed({
+    get: () => themeMode.value === "dark" || (themeMode.value === "system" && preferredDark.value),
+    set: (value: boolean) => { themeMode.value = value ? "dark" : "light" },
+  })
+  function toggleDark() {
+    themeMode.value = isDark.value ? "light" : "dark"
+  }
+
+  watchEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark.value)
+  })
 
   // 窗口背景图片（持久化）
   const background = useStorage<BackgroundKey>("frpcpilot:background", DEFAULT_BACKGROUND, preferences)
@@ -52,6 +64,7 @@ export const useAppStore = defineStore("app", () => {
   // 磨砂玻璃透明度（0 - 100，数值越大越透明，持久化）
   const cardTransparency = useStorage<number>("frpcpilot:card-transparency", 55, preferences)
   const modalTransparency = useStorage<number>("frpcpilot:modal-transparency", 38, preferences)
+  const backgroundOverlayTransparency = useStorage<number>("frpcpilot:background-overlay-transparency", 82, preferences)
 
   /** 透明度百分比 → 背景 alpha（越大越透明，alpha 越小；并做范围兜底） */
   function alphaFromTransparency(value: number) {
@@ -61,6 +74,7 @@ export const useAppStore = defineStore("app", () => {
 
   const cardAlpha = computed(() => alphaFromTransparency(cardTransparency.value))
   const modalAlpha = computed(() => alphaFromTransparency(modalTransparency.value))
+  const backgroundOverlayAlpha = computed(() => alphaFromTransparency(backgroundOverlayTransparency.value))
 
   // 把透明度实时写入 <html> 的 CSS 变量，供磨砂玻璃样式（卡片 / 弹窗）即时生效
   watchEffect(() => {
@@ -68,6 +82,7 @@ export const useAppStore = defineStore("app", () => {
     root.style.setProperty("--app-card-alpha", String(cardAlpha.value))
     root.style.setProperty("--app-card-alpha-hover", String(Math.min(cardAlpha.value + 0.15, 0.95)))
     root.style.setProperty("--app-modal-alpha", String(modalAlpha.value))
+    root.style.setProperty("--app-background-overlay-alpha", String(backgroundOverlayAlpha.value))
   })
 
   // Frpc 运行状态（后续由后端驱动）
@@ -99,11 +114,13 @@ export const useAppStore = defineStore("app", () => {
     language,
     sidebarCollapsed,
     isDark,
+    themeMode,
     toggleDark,
     background,
     backgroundUrl,
     cardTransparency,
     modalTransparency,
+    backgroundOverlayTransparency,
     runStatus,
     antdLocale,
     setLanguage,

@@ -6,8 +6,24 @@
         <!-- 主题模式 -->
         <section class="mb-6">
             <div class="mb-2 text-sm font-medium">{{ t("settings.appearance.themeMode") }}</div>
-            <a-segmented v-model:value="themeMode" :options="themeOptions" block />
+            <a-segmented v-model:value="appStore.themeMode" :options="themeOptions" block />
             <p class="mt-2 text-xs opacity-60">{{ t("settings.appearance.themeModeTip") }}</p>
+        </section>
+
+        <a-divider />
+
+        <section class="mb-6">
+            <div class="mb-1 text-sm font-medium">{{ t("settings.appearance.backgroundOverlay") }}</div>
+            <p class="mb-3 text-xs opacity-60">{{ t("settings.appearance.backgroundOverlayTip") }}</p>
+            <div class="mb-1 flex items-center justify-between text-xs">
+                <span>{{ t("settings.appearance.overlayTransparency") }}</span>
+                <span class="font-medium tabular-nums">{{ appStore.backgroundOverlayTransparency }}%</span>
+            </div>
+            <a-slider v-model:value="appStore.backgroundOverlayTransparency" :min="0" :max="100" />
+            <div class="overlay-preview" :style="{ '--preview-overlay-alpha': `${(100 - appStore.backgroundOverlayTransparency) / 100}` }" aria-hidden="true">
+                <span>{{ t("settings.appearance.backgroundOverlayPreview") }}</span>
+                <div class="overlay-preview-toolbar"><i /><i /><i /></div>
+            </div>
         </section>
 
         <a-divider />
@@ -69,21 +85,13 @@
 
 <script setup lang="ts">
 import { h } from "vue"
-import { BulbFilled, BulbOutlined, CheckCircleFilled } from "@ant-design/icons-vue"
+import { BulbFilled, BulbOutlined, CheckCircleFilled, DesktopOutlined } from "@ant-design/icons-vue"
 import { useI18n } from "vue-i18n"
 import { backgroundOptions, type BackgroundKey } from "@/config/backgrounds"
 import { useAppStore } from "@/stores/app"
 
 const { t } = useI18n()
 const appStore = useAppStore()
-
-/** 主题模式：与 store 中的 isDark 双向绑定 */
-const themeMode = computed({
-    get: () => (appStore.isDark ? "dark" : "light"),
-    set: (value: string | number) => {
-        appStore.isDark = value === "dark"
-    },
-})
 
 const themeOptions = computed(() => [
     {
@@ -98,6 +106,13 @@ const themeOptions = computed(() => [
         label: h("span", { class: "inline-flex items-center gap-2" }, [
             h(BulbFilled),
             t("settings.appearance.dark"),
+        ]),
+    },
+    {
+        value: "system",
+        label: h("span", { class: "inline-flex items-center gap-2" }, [
+            h(DesktopOutlined),
+            t("settings.appearance.system"),
         ]),
     },
 ])
@@ -132,23 +147,75 @@ function selectBackground(key: BackgroundKey) {
 }
 
 .bg-thumb--none {
-    background-image: repeating-linear-gradient(45deg,
-            rgba(148, 163, 184, 0.25) 0 8px,
-            transparent 8px 16px);
+    background-color: #e9edef;
 }
 
-/* 透明度实时预览：纯色底图（暖调中性色，不用渐变）+ 卡片 / 弹窗两种磨砂效果 */
+.dark .bg-thumb--none {
+    background-color: #151c1d;
+}
+
+.overlay-preview {
+    position: relative;
+    display: flex;
+    height: 88px;
+    align-items: flex-end;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 8px;
+    background-color: #71817b;
+    color: #14201d;
+    font-size: 11px;
+}
+
+.overlay-preview::before {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, var(--preview-overlay-alpha));
+    content: "";
+    pointer-events: none;
+}
+
+.overlay-preview > * {
+    position: relative;
+}
+
+.dark .overlay-preview {
+    border-color: rgba(255, 255, 255, 0.12);
+    background-color: #71817b;
+    color: #f1f5f3;
+}
+
+.dark .overlay-preview::before {
+    background: rgba(0, 0, 0, var(--preview-overlay-alpha));
+}
+
+.overlay-preview-toolbar {
+    display: flex;
+    gap: 5px;
+}
+
+.overlay-preview-toolbar i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+}
+
+/* 透明度实时预览：中性纯色底图 + 卡片 / 弹窗两种磨砂效果 */
 .glass-preview {
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 14px;
     border-radius: 12px;
-    background-color: #a09adf;
+    background-color: #778880;
 }
 
 .dark .glass-preview {
-    background-color: #a09adf;
+    background-color: #778880;
 }
 
 .glass-preview-card,
