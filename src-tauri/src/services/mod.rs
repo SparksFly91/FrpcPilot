@@ -1,3 +1,4 @@
+pub mod background;
 pub mod config;
 pub mod db;
 pub mod runner;

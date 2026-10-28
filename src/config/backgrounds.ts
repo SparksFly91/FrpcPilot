@@ -9,7 +9,7 @@ import bg8 from "@/assets/images/bg-8.webp"
 import bg9 from "@/assets/images/bg-9.webp"
 
 /** 窗口背景图片标识 */
-export type BackgroundKey = "none" | "bg-1" | "bg-2" | "bg-3" | "bg-4" | "bg-5" | "bg-6" | "bg-7" | "bg-8" | "bg-9"
+export type BackgroundKey = "none" | "custom" | "bg-1" | "bg-2" | "bg-3" | "bg-4" | "bg-5" | "bg-6" | "bg-7" | "bg-8" | "bg-9"
 
 export interface BackgroundOption {
   /** 唯一标识 */
@@ -38,5 +38,6 @@ export const DEFAULT_BACKGROUND: BackgroundKey = "none"
 
 /** 根据标识取图片地址 */
 export function getBackgroundUrl(key: BackgroundKey): string {
+  if (key === "custom") return ""
   return backgroundOptions.find((item) => item.key === key)?.url ?? ""
 }

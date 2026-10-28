@@ -5,6 +5,7 @@ mod services;
 use tauri::{Manager, RunEvent};
 use tauri_plugin_autostart::ManagerExt as _;
 
+use crate::commands::background::{choose_custom_background, get_custom_background};
 use crate::commands::frp::{
     delete_frp, download_frp, get_frp_downloads, get_frp_releases, import_frp,
 };

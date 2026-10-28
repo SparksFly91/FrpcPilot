@@ -47,6 +47,44 @@
                         <CheckCircleFilled v-if="appStore.background === bg.key" class="shrink-0 text-[#6366f1]" />
                     </div>
                 </a-card>
+
+                <a-card
+                    hoverable
+                    size="small"
+                    class="bg-card overflow-hidden"
+                    :class="{ 'bg-card--active': appStore.background === 'custom' }"
+                    :body-style="{ padding: '8px 10px' }"
+                    @click="selectCustomBackground"
+                >
+                    <template #cover>
+                        <div
+                            v-if="appStore.customBackgroundUrl"
+                            class="bg-thumb"
+                            :style="{ backgroundImage: `url('${appStore.customBackgroundUrl}')` }"
+                        />
+                        <div v-else class="bg-thumb bg-thumb--custom-empty">
+                            <a-button type="link" :icon="h(PictureOutlined)" @click.stop="chooseCustomBackground">
+                                {{ t("settings.appearance.chooseCustomBackground") }}
+                            </a-button>
+                        </div>
+                    </template>
+
+                    <div class="flex items-center justify-between gap-1 text-xs">
+                        <span class="truncate">{{ t("settings.appearance.customBackground") }}</span>
+                        <a-space :size="2">
+                            <a-tooltip :title="t('settings.appearance.changeCustomBackground')">
+                                <a-button
+                                    type="text"
+                                    size="small"
+                                    :icon="h(UploadOutlined)"
+                                    :aria-label="t('settings.appearance.changeCustomBackground')"
+                                    @click.stop="chooseCustomBackground"
+                                />
+                            </a-tooltip>
+                            <CheckCircleFilled v-if="appStore.background === 'custom'" class="shrink-0 text-[#6366f1]" />
+                        </a-space>
+                    </div>
+                </a-card>
             </div>
         </section>
 
@@ -85,7 +123,8 @@
 
 <script setup lang="ts">
 import { h } from "vue"
-import { BulbFilled, BulbOutlined, CheckCircleFilled, DesktopOutlined } from "@ant-design/icons-vue"
+import { BulbFilled, BulbOutlined, CheckCircleFilled, DesktopOutlined, PictureOutlined, UploadOutlined } from "@ant-design/icons-vue"
+import { message } from "ant-design-vue"
 import { useI18n } from "vue-i18n"
 import { backgroundOptions, type BackgroundKey } from "@/config/backgrounds"
 import { useAppStore } from "@/stores/app"
@@ -120,6 +159,22 @@ const themeOptions = computed(() => [
 function selectBackground(key: BackgroundKey) {
     appStore.setBackground(key)
 }
+
+async function selectCustomBackground() {
+    if (appStore.customBackgroundUrl) {
+        appStore.setBackground("custom")
+        return
+    }
+    await chooseCustomBackground()
+}
+
+async function chooseCustomBackground() {
+    try {
+        await appStore.chooseCustomBackground()
+    } catch (error) {
+        message.error(error instanceof Error ? error.message : String(error))
+    }
+}
 </script>
 
 <style scoped lang="scss">
@@ -148,6 +203,17 @@ function selectBackground(key: BackgroundKey) {
 
 .bg-thumb--none {
     background-color: #e9edef;
+}
+
+.bg-thumb--custom-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dfe5e4;
+}
+
+.dark .bg-thumb--custom-empty {
+    background: #252f30;
 }
 
 .dark .bg-thumb--none {

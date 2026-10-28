@@ -1,5 +1,7 @@
 import { defineStore } from "pinia"
+import { convertFileSrc } from "@tauri-apps/api/core"
 import { preferences } from "@/utils/preferences"
+import { chooseCustomBackground as chooseCustomBackgroundFile, getCustomBackground } from "@/api/background"
 import zhCN from "ant-design-vue/es/locale/zh_CN"
 import enUS from "ant-design-vue/es/locale/en_US"
 import { setI18nLanguage, type Language } from "@/i18n"
@@ -8,6 +10,7 @@ import {
   getBackgroundUrl,
   type BackgroundKey,
 } from "@/config/backgrounds"
+import { isTauri } from "@/utils/window"
 
 /** Frpc 运行状态 */
 export type RunStatus = "running" | "error" | "stopped"
@@ -46,7 +49,35 @@ export const useAppStore = defineStore("app", () => {
 
   // 窗口背景图片（持久化）
   const background = useStorage<BackgroundKey>("frpcpilot:background", DEFAULT_BACKGROUND, preferences)
-  const backgroundUrl = computed(() => getBackgroundUrl(background.value))
+  const customBackgroundPath = ref("")
+  const customBackgroundRevision = ref(0)
+  const customBackgroundUrl = computed(() => {
+    if (!customBackgroundPath.value) return ""
+    return `${convertFileSrc(customBackgroundPath.value)}?v=${customBackgroundRevision.value}`
+  })
+  const backgroundUrl = computed(() => background.value === "custom" ? customBackgroundUrl.value : getBackgroundUrl(background.value))
+
+  async function loadCustomBackground() {
+    if (!isTauri()) return
+    try {
+      customBackgroundPath.value = (await getCustomBackground()) ?? ""
+      customBackgroundRevision.value = Date.now()
+    } catch (error) {
+      console.error("Failed to load custom background", error)
+    }
+  }
+
+  async function chooseCustomBackground() {
+    if (!isTauri()) throw new Error("自定义背景图片仅在桌面应用中可用")
+    const path = await chooseCustomBackgroundFile()
+    if (!path) return false
+    customBackgroundPath.value = path
+    customBackgroundRevision.value = Date.now()
+    background.value = "custom"
+    return true
+  }
+
+  void loadCustomBackground()
 
   // 把背景图同步到 <html>（整窗背景，避免元素高度误差造成的上下留白）
   watchEffect(() => {
@@ -118,6 +149,8 @@ export const useAppStore = defineStore("app", () => {
     toggleDark,
     background,
     backgroundUrl,
+    customBackgroundUrl,
+    chooseCustomBackground,
     cardTransparency,
     modalTransparency,
     backgroundOverlayTransparency,
